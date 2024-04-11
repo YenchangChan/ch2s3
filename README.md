@@ -1,92 +1,115 @@
-# ch2s3
+# 功能介绍
+`ch2s3`, 从字面意义上理解，就是将`clickhouse`的数据备份到`S3`对象存储上的意思。
 
+通过该工具，可以非常便捷地批量将表按照分区备份到`S3`，并且所有数据都是可恢复的。
 
+`ch2s3`利用`clickhouse`的`backup`命令进行备份，在备份时会进行二次压缩，尽可能减小带宽压力和存储空间成本。对于有多副本的`clickhouse`集群，每个分片仅备份一个副本，不会重复存储数据。
 
-## Getting started
+该备份工具主要针对`clickhouse`集群，且表引擎为`MergeTree`的表，默认按照`toYYYYMMDD`格式的按天分区备份。如果有不通的分区方式，可自行指定分区。
 
-To make it easy for you to get started with GitLab, here's a list of recommended next steps.
+之所以采用这种方式来备份，主要是为了将S3与clickhouse彻底解耦，如果将S3作为clickhouse的一块磁盘，如果S3出问题，很可能造成clickhouse集群无法正常工作。而ch2s3即使失败，也仅仅是备份失败，可以通过补数的方式重新备份，而不影响clickhouse集群的工作状态。
 
-Already a pro? Just edit this README.md and make it your own. Want to make it easy? [Use the template at the bottom](#editing-this-readme)!
+ch2s3会通过报表的形式输出每次备份的结果，包含一共备份了多少张表，成功了多少，失败了多少，每张表的条数，大小，耗时，以及总的大小和耗时。如果备份失败，也会罗列出失败原因，便于排障。
+# 命令行参数
+- `-p`
+    - 指定`partition`，如果不指定，默认以今天作为`partition`
+- `-ttl`
+    - 通过`ttl`的方式指定备份日期，比如可以指定7天前，3个月前，1年前的方式来动态备份
+# 配置文件
+## 配置说明
+配置文件放在`conf`目录下，配置文件名称为`backup.json`。包含以下内容：
 
-## Add your files
+- clickhouse
+| 配置项| 默认值| 说明|
+|------|------|-----|
+|cluster||集群名|
+|hosts||二层数组，外层为shard，内层为replica|
+|port|9000|clickhouse端口|
+|user|default|clickhouse连接用户|
+|password||clickhouse连接密码|
+|clean|true|备份成功后是否删除掉本地数据|
+|database|default|需要备份的数据库|
+|tables||需要备份的表，数组形式，可以是多个表|
+- s3
+|------|------|-----|
+|endpoint||S3端点地址，需要带bucket名|
+|accessKey||访问秘钥|
+|secretKey||秘钥|
+|compress_method|lz4|压缩算法，支持lz4, lz4hc, zstd,deflate_qpl|
+|compress_level|3|压缩等级|
+|ignore_exists|true|如果S3上已有备份数据，是否报错，默认不报错|
+|retry_times|0|备份失败重试次数，默认不重试|
+## 配置示例
+```json
+{
+    "clickhouse": {
+        "cluster":"abc",
+        "hosts":[
+            ["192.168.101.93", "192.168.101.94"],
+            ["192.168.101.96", "192.168.101.97"]
+        ],
+        "port": 19000,
+        "user":"default",
+        "password":"123456",
+		"clean": false,
+        "database":"default",
+        "tables":[
+            "test_ck_dataq_r77",
+            "test_ck_dataq_r76",
+			"test_ck_dataq_r75",
+			"test_ck_dataq_r74"
+        ]
+    },
+    "s3":{
+        "endpoint":"http://192.168.101.94:49000/backup",
+        "accessKey":"VdmPbwvMlH8ryeqW",
+        "secretKey":"8z16tUktXpvcjjy5M4MqXvCks5MMHb63",
+        "compress_method":"zstd"
+    }
+}
+```
+# 如何使用
+- 指定分区
+```bash
+./ch2s3 -p "20230731"
+```
+- 指定TTL
+```bash
+./ch2s3 -ttl "5 DAY"  #备份5天前的数据（当天）
+./ch2s3 -ttl "2 WEEK" #备份2周前的数据（当天）
+./ch2s3 -ttl "3 MONTH" #备份3个月前的数据（当天）
+./ch2s3 -ttl "1 YEAR" #备份1年前的数据（当天） 
+```
+# 报表
+报表默认输出在reporter目录，示例如下：
+```txt
+Backup Date: 20230731
 
-- [ ] [Create](https://docs.gitlab.com/ee/user/project/repository/web_editor.html#create-a-file) or [upload](https://docs.gitlab.com/ee/user/project/repository/web_editor.html#upload-a-file) files
-- [ ] [Add files using the command line](https://docs.gitlab.com/ee/gitlab-basics/add-file.html#add-a-file-using-the-command-line) or push an existing Git repository with the following command:
++--------------------------------+---------------+---------------+---------------+---------------+
+|            table               |     rows      |  size(local)  |   elapsed     |    status     |
++--------------------------------+---------------+---------------+---------------+---------------+
+|       default.test_ck_dataq_r77|       25442407|      48.93 GiB|         41 sec|        SUCCESS|
+|       default.test_ck_dataq_r76|       20490054|      40.00 GiB|         24 sec|        SUCCESS|
+|       default.test_ck_dataq_r75|       24731492|      48.16 GiB|         35 sec|        SUCCESS|
+|       default.test_ck_dataq_r74|       16349252|      31.45 GiB|         26 sec|        SUCCESS|
++--------------------------------+---------------+---------------+---------------+---------------+
+
+Total Tables: 4,  Success Tables: 4,  Failed Tables: 0,  Total Bytes: 168.53 GiB,  Elapsed: 126 sec
+
 
 ```
-cd existing_repo
-git remote add origin https://code.eoitek.net/monitor/DataStorage/ch2s3.git
-git branch -M main
-git push -uf origin main
+# 性能
+经测试，备份160G数据，共计耗时120秒，平均1.33G/s， 存储到S3上数据大小为90G左右，有二次压缩。
+
+# 最佳实践
+## 定时任务
+可以通过crontab拉起定时任务的方式实现每日备份，比如需要备份1年前的数据，只需要配置好配置文件后，通过crontab拉起下面的脚本即可：
+```bash
+0 2 * * * /usr/local/ch2s3/bin/ch2s3 -ttl "1 YEAR" > /var/log/ch2s3.log
 ```
-
-## Integrate with your tools
-
-- [ ] [Set up project integrations](https://code.eoitek.net/monitor/DataStorage/ch2s3/-/settings/integrations)
-
-## Collaborate with your team
-
-- [ ] [Invite team members and collaborators](https://docs.gitlab.com/ee/user/project/members/)
-- [ ] [Create a new merge request](https://docs.gitlab.com/ee/user/project/merge_requests/creating_merge_requests.html)
-- [ ] [Automatically close issues from merge requests](https://docs.gitlab.com/ee/user/project/issues/managing_issues.html#closing-issues-automatically)
-- [ ] [Enable merge request approvals](https://docs.gitlab.com/ee/user/project/merge_requests/approvals/)
-- [ ] [Automatically merge when pipeline succeeds](https://docs.gitlab.com/ee/user/project/merge_requests/merge_when_pipeline_succeeds.html)
-
-## Test and Deploy
-
-Use the built-in continuous integration in GitLab.
-
-- [ ] [Get started with GitLab CI/CD](https://docs.gitlab.com/ee/ci/quick_start/index.html)
-- [ ] [Analyze your code for known vulnerabilities with Static Application Security Testing(SAST)](https://docs.gitlab.com/ee/user/application_security/sast/)
-- [ ] [Deploy to Kubernetes, Amazon EC2, or Amazon ECS using Auto Deploy](https://docs.gitlab.com/ee/topics/autodevops/requirements.html)
-- [ ] [Use pull-based deployments for improved Kubernetes management](https://docs.gitlab.com/ee/user/clusters/agent/)
-- [ ] [Set up protected environments](https://docs.gitlab.com/ee/ci/environments/protected_environments.html)
-
-***
-
-# Editing this README
-
-When you're ready to make this README your own, just edit this file and use the handy template below (or feel free to structure it however you want - this is just a starting point!). Thank you to [makeareadme.com](https://www.makeareadme.com/) for this template.
-
-## Suggestions for a good README
-Every project is different, so consider which of these sections apply to yours. The sections used in the template are suggestions for most open source projects. Also keep in mind that while a README can be too long and detailed, too long is better than too short. If you think your README is too long, consider utilizing another form of documentation rather than cutting out information.
-
-## Name
-Choose a self-explaining name for your project.
-
-## Description
-Let people know what your project can do specifically. Provide context and add a link to any reference visitors might be unfamiliar with. A list of Features or a Background subsection can also be added here. If there are alternatives to your project, this is a good place to list differentiating factors.
-
-## Badges
-On some READMEs, you may see small images that convey metadata, such as whether or not all the tests are passing for the project. You can use Shields to add some to your README. Many services also have instructions for adding a badge.
-
-## Visuals
-Depending on what you are making, it can be a good idea to include screenshots or even a video (you'll frequently see GIFs rather than actual videos). Tools like ttygif can help, but check out Asciinema for a more sophisticated method.
-
-## Installation
-Within a particular ecosystem, there may be a common way of installing things, such as using Yarn, NuGet, or Homebrew. However, consider the possibility that whoever is reading your README is a novice and would like more guidance. Listing specific steps helps remove ambiguity and gets people to using your project as quickly as possible. If it only runs in a specific context like a particular programming language version or operating system or has dependencies that have to be installed manually, also add a Requirements subsection.
-
-## Usage
-Use examples liberally, and show the expected output if you can. It's helpful to have inline the smallest example of usage that you can demonstrate, while providing links to more sophisticated examples if they are too long to reasonably include in the README.
-
-## Support
-Tell people where they can go to for help. It can be any combination of an issue tracker, a chat room, an email address, etc.
-
-## Roadmap
-If you have ideas for releases in the future, it is a good idea to list them in the README.
-
-## Contributing
-State if you are open to contributions and what your requirements are for accepting them.
-
-For people who want to make changes to your project, it's helpful to have some documentation on how to get started. Perhaps there is a script that they should run or some environment variables that they need to set. Make these steps explicit. These instructions could also be useful to your future self.
-
-You can also document commands to lint the code or run tests. These steps help to ensure high code quality and reduce the likelihood that the changes inadvertently break something. Having instructions for running tests is especially helpful if it requires external setup, such as starting a Selenium server for testing in a browser.
-
-## Authors and acknowledgment
-Show your appreciation to those who have contributed to the project.
-
-## License
-For open source projects, say how it is licensed.
-
-## Project status
-If you have run out of energy or time for your project, put a note at the top of the README saying that development has slowed down or stopped completely. Someone may choose to fork your project or volunteer to step in as a maintainer or owner, allowing your project to keep going. You can also make an explicit request for maintainers.
+以上表示每天晚上2点整执行ch2s3备份，每次备份一年前的当天数据。
+## 失败补数
+假设20230731备份失败，那么可以通过手动执行下面命令重新备份该分区数据：
+```bash
+/usr/local/bin/ch2s3 -p "20230731"
+```

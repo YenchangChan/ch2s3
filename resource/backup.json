@@ -1,0 +1,27 @@
+{
+    "clickhouse": {
+        "cluster":"abc",
+        "hosts":[
+            ["192.168.101.93", "192.168.101.94"],
+            ["192.168.101.96", "192.168.101.97"]
+        ],
+        "port": 19000,
+        "username":"default",
+        "password":"123456",
+		"clean": false,
+        "database":"default",
+        "tables":[
+            "test_ck_dataq_r77",
+            "test_ck_dataq_r76",
+			"test_ck_dataq_r75",
+			"test_ck_dataq_r74"
+        ]
+    },
+    "s3":{
+        "endpoint":"http://192.168.101.94:49000/backup",
+        "accessKey":"VdmPbwvMlH8ryeqW",
+        "secretKey":"8z16tUktXpvcjjy5M4MqXvCks5MMHb63",
+        "region":"",
+        "compression":"zstd"
+    }
+}
