@@ -32,8 +32,11 @@ func main() {
 	}
 
 	config.DompConfig(conf)
-
-	back := backup.NewBack(conf, *partition, cwd)
+	current_partition_only := false
+	if *ttl == "" {
+		current_partition_only = true
+	}
+	back := backup.NewBack(conf, *partition, cwd, current_partition_only)
 
 	if err = back.Init(); err != nil {
 		log.Fatalf("backup init failed:%v", err)

@@ -93,42 +93,55 @@ func Close() {
 	}
 }
 
-func Size(database, table, partition string) (uint64, error) {
+func Size(database, table, partition string, cponly bool) (uint64, uint64, error) {
 	var lastErr error
 	var wg sync.WaitGroup
-	var bytes uint64
+	var lock sync.Mutex
+	var uncompressed_size, compressed_size uint64
 	wg.Add(len(conns))
-	query := fmt.Sprintf("SELECT sum(data_uncompressed_bytes) FROM system.parts WHERE partition = '%s' AND database = '%s' AND table = '%s'",
-		partition, database, table)
+	op := "<="
+	if cponly {
+		op = "="
+	}
+	query := fmt.Sprintf("SELECT sum(data_uncompressed_bytes), sum(data_compressed_bytes) FROM system.parts WHERE partition %s '%s' AND database = '%s' AND table = '%s'",
+		op, partition, database, table)
 	log.Printf("execute sql => %s", query)
 	for i := range conns {
 		conn, err := GetAvaliableConn(i)
 		if err != nil {
-			return 0, err
+			return 0, 0, err
 		}
 		go func(c driver.Conn) {
 			defer wg.Done()
-			var bsize uint64
-			err := c.QueryRow(context.Background(), query).Scan(&bsize)
+			var buncsize, bcsize uint64
+			err := c.QueryRow(context.Background(), query).Scan(&buncsize, &bcsize)
 			if err != nil {
 				lastErr = err
 				return
 			}
-			bytes += bsize
+			lock.Lock()
+			uncompressed_size += buncsize
+			compressed_size += bcsize
+			lock.Unlock()
 		}(conn.c)
 	}
 	wg.Wait()
-	log.Printf("execute result => %v", bytes)
-	return bytes, lastErr
+	log.Printf("execute result => %v, %v", uncompressed_size, compressed_size)
+	return uncompressed_size, compressed_size, lastErr
 }
 
-func Rows(database, table, partition string) (uint64, error) {
+func Rows(database, table, partition string, cponly bool) (uint64, error) {
 	var lastErr error
 	var wg sync.WaitGroup
+	var lock sync.Mutex
 	var count uint64
 	wg.Add(len(conns))
-	query := fmt.Sprintf("SELECT sum(rows) FROM system.parts WHERE partition = '%s' AND database = '%s' AND table = '%s'",
-		partition, database, table)
+	op := "<="
+	if cponly {
+		op = "="
+	}
+	query := fmt.Sprintf("SELECT sum(rows) FROM system.parts WHERE partition %s '%s' AND database = '%s' AND table = '%s'",
+		op, partition, database, table)
 	log.Printf("execute sql => %s", query)
 	for i := range conns {
 		conn, err := GetAvaliableConn(i)
@@ -143,12 +156,59 @@ func Rows(database, table, partition string) (uint64, error) {
 				lastErr = err
 				return
 			}
+			lock.Lock()
 			count += cnt
+			lock.Unlock()
 		}(conn.c)
 	}
 	wg.Wait()
 	log.Printf("execute result => %v", count)
 	return count, lastErr
+}
+
+func Partitions(database, table, partition string, cponly bool) ([]string, error) {
+	var lastErr error
+	var wg sync.WaitGroup
+	var partitions []string
+	var lock sync.Mutex
+	wg.Add(len(conns))
+	op := "<="
+	if cponly {
+		op = "="
+	}
+	query := fmt.Sprintf("SELECT partition FROM system.parts WHERE partition %s '%s' AND database = '%s' AND table = '%s'",
+		op, partition, database, table)
+	log.Printf("execute sql => %s", query)
+	for i := range conns {
+		conn, err := GetAvaliableConn(i)
+		if err != nil {
+			return partitions, err
+		}
+		go func(c driver.Conn) {
+			defer wg.Done()
+
+			rows, err := c.Query(context.Background(), query)
+			if err != nil {
+				lastErr = err
+				return
+			}
+			defer rows.Close()
+			for rows.Next() {
+				var partition string
+				err := rows.Scan(&partition)
+				if err != nil {
+					lastErr = err
+					return
+				}
+				lock.Lock()
+				partitions = append(partitions, partition)
+				lock.Unlock()
+			}
+		}(conn.c)
+	}
+	wg.Wait()
+	log.Printf("execute result => %v", partitions)
+	return partitions, lastErr
 }
 
 /*
@@ -164,7 +224,6 @@ func genBackupSql(database, table, partition, host string, conf config.S3) strin
 	sql += fmt.Sprintf(" TO S3('%s/%s/%s.%s/%s', '%s', '%s')",
 		conf.Endpoint, partition, database, table, host, conf.AccessKey, conf.SecretKey)
 	sql += fmt.Sprintf(" SETTINGS compression_method='%s', compression_level=%d", conf.CompressMethod, conf.CompressLevel)
-	log.Printf("backup sql => %s", sql)
 	return sql
 }
 
@@ -180,6 +239,7 @@ func Ch2S3(database, table, partition string, conf config.S3) error {
 		go func(conn Conn) {
 			defer wg.Done()
 			query := genBackupSql(database, table, partition, conn.h, conf)
+			log.Printf("backup sql => [%s]%s", conn.h, query)
 			if err := retry.Do(
 				func() error {
 					err := conn.c.Exec(context.Background(), query)

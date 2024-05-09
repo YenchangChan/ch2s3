@@ -1,6 +1,8 @@
 package backup
 
-import "time"
+import (
+	"time"
+)
 
 const (
 	BACKUP_SUCCESS = 0
@@ -8,19 +10,23 @@ const (
 )
 
 type State struct {
-	start   time.Time
-	elasped int
-	rows    uint64
-	bsize   uint64
-	extval  int
-	why     error
+	start      time.Time
+	elasped    int
+	partitions int
+	rows       uint64
+	buncsize   uint64
+	bcsize     uint64
+	extval     int
+	why        error
 }
 
-func NewState(rows, bsize uint64) *State {
+func NewState(rows, buncsize, bcsize uint64, partitions int) *State {
 	return &State{
-		start: time.Now(),
-		rows:  rows,
-		bsize: bsize,
+		start:      time.Now(),
+		partitions: partitions,
+		rows:       rows,
+		buncsize:   buncsize,
+		bcsize:     bcsize,
 	}
 }
 

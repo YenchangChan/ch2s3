@@ -5,6 +5,7 @@ import (
 	"log"
 	"os"
 	"path"
+	"time"
 
 	"github.com/YenchangChan/ch2s3/ch"
 	"github.com/YenchangChan/ch2s3/config"
@@ -13,17 +14,19 @@ import (
 type Backup struct {
 	conf      *config.Config
 	partition string
+	cponly    bool
 	states    map[string]*State
 	reporter  string
 }
 
-func NewBack(conf *config.Config, partition, cwd string) *Backup {
+func NewBack(conf *config.Config, partition, cwd string, cponly bool) *Backup {
 	os.Mkdir(path.Join(cwd, "reporter"), 0644)
 	return &Backup{
 		conf:      conf,
 		partition: partition,
+		cponly:    cponly,
 		states:    make(map[string]*State),
-		reporter:  fmt.Sprintf(path.Join(cwd, "reporter/backup_%s.out"), partition),
+		reporter:  fmt.Sprintf(path.Join(cwd, "reporter/backup_%s_%s.out"), partition, time.Now().Format("2006-01-02T15:04:05")),
 	}
 }
 
@@ -37,22 +40,36 @@ func (this *Backup) Init() error {
 func (this *Backup) Do() error {
 	for _, table := range this.conf.ClickHouse.Tables {
 		statekey := fmt.Sprintf("%s.%s", this.conf.ClickHouse.Database, table)
-		rows, err := ch.Rows(this.conf.ClickHouse.Database, table, this.partition)
+		rows, err := ch.Rows(this.conf.ClickHouse.Database, table, this.partition, this.cponly)
 		if err != nil {
 			return err
 		}
-		bsize, err := ch.Size(this.conf.ClickHouse.Database, table, this.partition)
+		buncsize, bczise, err := ch.Size(this.conf.ClickHouse.Database, table, this.partition, this.cponly)
 		if err != nil {
 			return err
 		}
-		this.states[statekey] = NewState(rows, bsize)
-		err = ch.Ch2S3(this.conf.ClickHouse.Database, table, this.partition, this.conf.S3Disk)
-		if err != nil {
-			log.Printf("table %s backup failed: %v", statekey, err)
-			this.states[statekey].Failure(err)
-			continue
+		var partitions []string
+		if this.cponly {
+			partitions = []string{this.partition}
+		} else {
+			partitions, err = ch.Partitions(this.conf.ClickHouse.Database, table, this.partition, this.cponly)
 		}
-		this.states[statekey].Success()
+		this.states[statekey] = NewState(rows, buncsize, bczise, len(partitions))
+		ok := true
+		for i, p := range partitions {
+			log.Printf("(%d/%d) table %s [%s] backup ", i+1, len(partitions), statekey, p)
+			err = ch.Ch2S3(this.conf.ClickHouse.Database, table, p, this.conf.S3Disk)
+			if err != nil {
+				// 失败即中止整张表的备份
+				log.Printf("table %s backup failed: %v", statekey, err)
+				this.states[statekey].Failure(err)
+				ok = false
+				break
+			}
+		}
+		if ok {
+			this.states[statekey].Success()
+		}
 		log.Printf("backup table %s done", statekey)
 	}
 
@@ -72,20 +89,20 @@ func (this *Backup) Repoter() error {
 	if err != nil {
 		return err
 	}
-	f.WriteString("+--------------------------------+---------------+---------------+---------------+---------------+\n")
-	f.WriteString("|            table               |     rows      |  size(local)  |   elapsed     |    status     |\n")
-	f.WriteString("+--------------------------------+---------------+---------------+---------------+---------------+\n")
+	f.WriteString("+--------------------------------+---------------+----------------+---------------+---------------+---------------+\n")
+	f.WriteString("|            table               |     rows      |size(uncompress)| size(compress)|   elapsed     |    status     |\n")
+	f.WriteString("+--------------------------------+---------------+----------------+---------------+---------------+---------------+\n")
 	for k, v := range this.states {
-		f.WriteString(fmt.Sprintf("|%32s|%15d|%15s|%11d sec|%15s|\n", k, v.rows, formatReadableSize(v.bsize), v.elasped, status(v.extval)))
+		f.WriteString(fmt.Sprintf("|%32s|%15d|%16s|%15s|%11d sec|%15s|\n", k, v.rows, formatReadableSize(v.buncsize), formatReadableSize(v.bcsize), v.elasped, status(v.extval)))
 		if v.extval == BACKUP_SUCCESS {
 			ok_tables++
 		} else {
 			fail_tables++
 		}
-		total_bytes += v.bsize
+		total_bytes += v.buncsize
 		all_costs += v.elasped
 	}
-	f.WriteString("+--------------------------------+---------------+---------------+---------------+---------------+\n")
+	f.WriteString("+--------------------------------+---------------+----------------+---------------+---------------+---------------+\n")
 
 	f.WriteString(fmt.Sprintf("\nTotal Tables: %d,  Success Tables: %d,  Failed Tables: %d,  Total Bytes: %s,  Elapsed: %d sec\n", ok_tables+fail_tables, ok_tables, fail_tables, formatReadableSize(total_bytes), all_costs))
 
