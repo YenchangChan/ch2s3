@@ -28,7 +28,7 @@ func NewBack(conf *config.Config, op_type, partition, cwd string, cponly bool) *
 		partition: partition,
 		cponly:    cponly,
 		states:    make(map[string]*State),
-		reporter:  fmt.Sprintf(path.Join(cwd, "reporter/%s_%s_%s.out"), op_type, partition, time.Now().Format("2006-01-02T15:04:05")),
+		reporter:  fmt.Sprintf(path.Join(cwd, "reporter/%s_%s.out"), op_type, time.Now().Format("20060102T15:04:05")),
 	}
 }
 
@@ -52,7 +52,7 @@ func (this *Backup) Do() error {
 		}
 		var partitions []string
 		if this.cponly {
-			partitions = []string{this.partition}
+			partitions = strings.Split(this.partition, ",")
 		} else {
 			partitions, err = ch.Partitions(this.conf.ClickHouse.Database, table, this.partition, this.cponly)
 		}
@@ -83,27 +83,38 @@ func (this *Backup) Restore() error {
 	var err error
 	for _, table := range this.conf.ClickHouse.Tables {
 		statekey := fmt.Sprintf("%s.%s", this.conf.ClickHouse.Database, table)
-		this.states[statekey] = NewState(0, 0, 0, 1)
-
-		err = ch.Restore(this.conf.ClickHouse.Database, table, this.partition, this.conf.S3Disk)
-		if err != nil {
-			log.Printf("table %s restore failed: %v", statekey, err)
-			this.states[statekey].Failure(err)
-			return err
+		ok := true
+		partitions := strings.Split(this.partition, ",")
+		this.states[statekey] = NewState(0, 0, 0, len(partitions))
+		var rows, buncsize, bcsize uint64
+		for i, p := range partitions {
+			log.Printf("(%d/%d) table %s [%s] restore ", i+1, len(partitions), statekey, p)
+			err = ch.Restore(this.conf.ClickHouse.Database, table, p, this.conf.S3Disk)
+			if err != nil {
+				log.Printf("table %s restore failed: %v", statekey, err)
+				this.states[statekey].Failure(err)
+				ok = false
+				break
+			}
+			row, err := ch.Rows(this.conf.ClickHouse.Database, table, p, true)
+			if err != nil {
+				return err
+			}
+			bunc, bc, err := ch.Size(this.conf.ClickHouse.Database, table, p, true)
+			if err != nil {
+				return err
+			}
+			rows += row
+			buncsize += bunc
+			bcsize += bc
 		}
 
-		rows, err := ch.Rows(this.conf.ClickHouse.Database, table, this.partition, true)
-		if err != nil {
-			return err
-		}
-		buncsize, bczise, err := ch.Size(this.conf.ClickHouse.Database, table, this.partition, true)
-		if err != nil {
-			return err
-		}
 		this.states[statekey].Set(constant.STATE_ROWS, rows)
 		this.states[statekey].Set(constant.STATE_UNCOMPRESSED_SIZE, buncsize)
-		this.states[statekey].Set(constant.STATE_COMPRESSED_SIZE, bczise)
-		this.states[statekey].Success()
+		this.states[statekey].Set(constant.STATE_COMPRESSED_SIZE, bcsize)
+		if ok {
+			this.states[statekey].Success()
+		}
 		log.Printf("restore table %s done", statekey)
 	}
 	return nil

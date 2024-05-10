@@ -60,7 +60,8 @@ func init() {
 		op_type = constant.OP_TYPE_RESTORE
 	}
 
-	if *ttl != "" {
+	//指定TTL仅在备份时有效
+	if !*r && *ttl != "" {
 		//指定TTL时，默认按照toYYYYMMDD分区
 		ttlExpr := strings.SplitN(*ttl, " ", 2)
 		interval := ttlExpr[0]
