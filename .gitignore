@@ -2,5 +2,5 @@ vendor
 reporter
 conf
 release
-./ch2s3
+ch2s3
 ch2s3*.tar.gz

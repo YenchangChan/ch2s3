@@ -39,7 +39,7 @@ func main() {
 	if *ttl == "" {
 		current_partition_only = true
 	}
-	back := backup.NewBack(conf, *partition, cwd, current_partition_only)
+	back := backup.NewBack(conf, op_type, *partition, cwd, current_partition_only)
 	switch op_type {
 	case constant.OP_TYPE_BACKUP:
 		err = ch2s3(back)
@@ -111,7 +111,7 @@ func ch2s3(back *backup.Backup) error {
 
 	log.Println("backup to s3 success!")
 
-	if err = back.Repoter(); err != nil {
+	if err = back.Repoter(op_type); err != nil {
 		return err
 	}
 
@@ -139,7 +139,7 @@ func restore(back *backup.Backup) error {
 
 	log.Println("restore from s3 success!")
 
-	if err = back.Repoter(); err != nil {
+	if err = back.Repoter(op_type); err != nil {
 		return err
 	}
 

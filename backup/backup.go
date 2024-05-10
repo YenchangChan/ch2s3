@@ -5,6 +5,7 @@ import (
 	"log"
 	"os"
 	"path"
+	"strings"
 	"time"
 
 	"github.com/YenchangChan/ch2s3/ch"
@@ -20,14 +21,14 @@ type Backup struct {
 	reporter  string
 }
 
-func NewBack(conf *config.Config, partition, cwd string, cponly bool) *Backup {
+func NewBack(conf *config.Config, op_type, partition, cwd string, cponly bool) *Backup {
 	os.Mkdir(path.Join(cwd, "reporter"), 0644)
 	return &Backup{
 		conf:      conf,
 		partition: partition,
 		cponly:    cponly,
 		states:    make(map[string]*State),
-		reporter:  fmt.Sprintf(path.Join(cwd, "reporter/backup_%s_%s.out"), partition, time.Now().Format("2006-01-02T15:04:05")),
+		reporter:  fmt.Sprintf(path.Join(cwd, "reporter/%s_%s_%s.out"), op_type, partition, time.Now().Format("2006-01-02T15:04:05")),
 	}
 }
 
@@ -109,7 +110,7 @@ func (this *Backup) Restore() error {
 }
 
 // 出具报表
-func (this *Backup) Repoter() error {
+func (this *Backup) Repoter(op_type string) error {
 	f, err := os.OpenFile(this.reporter, os.O_CREATE|os.O_RDWR|os.O_TRUNC, 0644)
 	if err != nil {
 		return err
@@ -117,15 +118,15 @@ func (this *Backup) Repoter() error {
 	var ok_tables, fail_tables, total_bytes uint64
 	var all_costs int
 	defer f.Close()
-	_, err = f.WriteString(fmt.Sprintf("Backup Date: %s\n\n", this.partition))
+	_, err = f.WriteString(fmt.Sprintf("%s Date: %s\n\n", strings.Title(op_type), this.partition))
 	if err != nil {
 		return err
 	}
-	f.WriteString("+--------------------------------+---------------+----------------+---------------+---------------+---------------+\n")
-	f.WriteString("|            table               |     rows      |size(uncompress)| size(compress)|   elapsed     |    status     |\n")
-	f.WriteString("+--------------------------------+---------------+----------------+---------------+---------------+---------------+\n")
+	f.WriteString("+--------------------------------+---------------+------------------+-----------------+-----------+---------------+---------------+\n")
+	f.WriteString("|            table               |     rows      |size(uncompressed)| size(compressed)| partition |   elapsed     |    status     |\n")
+	f.WriteString("+--------------------------------+---------------+------------------+-----------------+-----------+---------------+---------------+\n")
 	for k, v := range this.states {
-		f.WriteString(fmt.Sprintf("|%32s|%15d|%16s|%15s|%11d sec|%15s|\n", k, v.rows, formatReadableSize(v.buncsize), formatReadableSize(v.bcsize), v.elasped, status(v.extval)))
+		f.WriteString(fmt.Sprintf("|%32s|%15d|%18s|%17s|%11d|%11d sec|%15s|\n", k, v.rows, formatReadableSize(v.buncsize), formatReadableSize(v.bcsize), v.partitions, v.elasped, status(v.extval)))
 		if v.extval == constant.BACKUP_SUCCESS {
 			ok_tables++
 		} else {
@@ -134,7 +135,7 @@ func (this *Backup) Repoter() error {
 		total_bytes += v.buncsize
 		all_costs += v.elasped
 	}
-	f.WriteString("+--------------------------------+---------------+----------------+---------------+---------------+---------------+\n")
+	f.WriteString("+--------------------------------+---------------+------------------+-----------------+-----------+---------------+---------------+\n")
 
 	f.WriteString(fmt.Sprintf("\nTotal Tables: %d,  Success Tables: %d,  Failed Tables: %d,  Total Bytes: %s,  Elapsed: %d sec\n", ok_tables+fail_tables, ok_tables, fail_tables, formatReadableSize(total_bytes), all_costs))
 
@@ -171,9 +172,4 @@ func (this *Backup) Cleanup() error {
 
 func (this *Backup) Stop() {
 	ch.Close()
-}
-
-// 统计恢复之后的数据
-func (this *Backup) Check() {
-
 }
