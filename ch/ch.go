@@ -170,13 +170,14 @@ func Partitions(database, table, partition string, cponly bool) ([]string, error
 	var lastErr error
 	var wg sync.WaitGroup
 	var partitions []string
+	mp := make(map[string]struct{})
 	var lock sync.Mutex
 	wg.Add(len(conns))
 	op := "<="
 	if cponly {
 		op = "="
 	}
-	query := fmt.Sprintf("SELECT partition FROM system.parts WHERE partition %s '%s' AND database = '%s' AND table = '%s'",
+	query := fmt.Sprintf("SELECT DISTINCT partition FROM system.parts WHERE partition %s '%s' AND database = '%s' AND table = '%s' ORDER BY partition",
 		op, partition, database, table)
 	log.Printf("execute sql => %s", query)
 	for i := range conns {
@@ -201,12 +202,15 @@ func Partitions(database, table, partition string, cponly bool) ([]string, error
 					return
 				}
 				lock.Lock()
-				partitions = append(partitions, partition)
+				mp[partition] = struct{}{}
 				lock.Unlock()
 			}
 		}(conn.c)
 	}
 	wg.Wait()
+	for p := range mp {
+		partitions = append(partitions, p)
+	}
 	log.Printf("execute result => %v", partitions)
 	return partitions, lastErr
 }
@@ -224,6 +228,22 @@ func genBackupSql(database, table, partition, host string, conf config.S3) strin
 	sql += fmt.Sprintf(" TO S3('%s/%s/%s.%s/%s', '%s', '%s')",
 		conf.Endpoint, partition, database, table, host, conf.AccessKey, conf.SecretKey)
 	sql += fmt.Sprintf(" SETTINGS compression_method='%s', compression_level=%d", conf.CompressMethod, conf.CompressLevel)
+	return sql
+}
+
+/*
+RESTORE TABLE default.test_ck_dataq_r50 PARTITION  '20230731'
+FROM S3('http://192.168.101.94:49000/backup/20230731/default.test_ck_dataq_r50/192.168.101.93', 'VdmPbwvMlH8ryeqW', '8z16tUktXpvcjjy5M4MqXvCks5MMHb63') SETTINGS allow_non_empty_tables = 1
+*/
+func genResoreSql(database, table, partition, host string, conf config.S3) string {
+	var sql string
+	sql = fmt.Sprintf("RESTORE TABLE `%s`.`%s` ", database, table)
+	if partition != "" {
+		sql += fmt.Sprintf(" PARTITION '%s'", partition)
+	}
+	sql += fmt.Sprintf(" FROM S3('%s/%s/%s.%s/%s', '%s', '%s')",
+		conf.Endpoint, partition, database, table, host, conf.AccessKey, conf.SecretKey)
+	sql += fmt.Sprintf(" SETTINGS allow_non_empty_tables=true")
 	return sql
 }
 
@@ -253,6 +273,40 @@ func Ch2S3(database, table, partition string, conf config.S3) error {
 								}
 							}
 						}
+						return err
+					}
+					return nil
+				},
+				retry.LastErrorOnly(true),
+				retry.Attempts(conf.RetryTimes),
+				retry.Delay(10*time.Second),
+			); err != nil {
+				lastErr = err
+				return
+			}
+		}(conn)
+	}
+	wg.Wait()
+	return lastErr
+}
+
+func Restore(database, table, partition string, conf config.S3) error {
+	var wg sync.WaitGroup
+	var lastErr error
+	wg.Add(len(conns))
+	for i := range conns {
+		conn, err := GetAvaliableConn(i)
+		if err != nil {
+			return err
+		}
+		go func(conn Conn) {
+			defer wg.Done()
+			query := genResoreSql(database, table, partition, conn.h, conf)
+			log.Printf("restore sql => [%s]%s", conn.h, query)
+			if err := retry.Do(
+				func() error {
+					err := conn.c.Exec(context.Background(), query)
+					if err != nil {
 						return err
 					}
 					return nil

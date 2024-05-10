@@ -2,11 +2,8 @@ package backup
 
 import (
 	"time"
-)
 
-const (
-	BACKUP_SUCCESS = 0
-	BACKUP_FAILURE = 1
+	"github.com/YenchangChan/ch2s3/constant"
 )
 
 type State struct {
@@ -30,19 +27,30 @@ func NewState(rows, buncsize, bcsize uint64, partitions int) *State {
 	}
 }
 
+func (s *State) Set(key string, value any) {
+	switch key {
+	case constant.STATE_ROWS:
+		s.rows = value.(uint64)
+	case constant.STATE_UNCOMPRESSED_SIZE:
+		s.buncsize = value.(uint64)
+	case constant.STATE_COMPRESSED_SIZE:
+		s.bcsize = value.(uint64)
+	}
+}
+
 func (s *State) Success() {
 	s.elasped = int(time.Since(s.start).Seconds())
-	s.extval = BACKUP_SUCCESS
+	s.extval = constant.BACKUP_SUCCESS
 }
 
 func (s *State) Failure(err error) {
 	s.elasped = int(time.Since(s.start).Seconds())
 	s.why = err
-	s.extval = BACKUP_FAILURE
+	s.extval = constant.BACKUP_FAILURE
 }
 
 func status(s int) string {
-	if s == BACKUP_SUCCESS {
+	if s == constant.BACKUP_SUCCESS {
 		return "SUCCESS"
 	} else {
 		return "FAILURE"

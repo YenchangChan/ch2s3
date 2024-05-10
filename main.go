@@ -11,12 +11,15 @@ import (
 
 	"github.com/YenchangChan/ch2s3/backup"
 	"github.com/YenchangChan/ch2s3/config"
+	"github.com/YenchangChan/ch2s3/constant"
 )
 
 var (
 	partition = flag.String("p", "", "which partition to backup")
 	ttl       = flag.String("ttl", "", "ttl interval")
+	r         = flag.Bool("restore", false, "restore table")
 
+	op_type    string
 	cwd        string
 	Version    string
 	BuildStamp string
@@ -37,36 +40,25 @@ func main() {
 		current_partition_only = true
 	}
 	back := backup.NewBack(conf, *partition, cwd, current_partition_only)
-
-	if err = back.Init(); err != nil {
-		log.Fatalf("backup init failed:%v", err)
+	switch op_type {
+	case constant.OP_TYPE_BACKUP:
+		err = ch2s3(back)
+	case constant.OP_TYPE_RESTORE:
+		err = restore(back)
 	}
-	log.Println("backup init success!")
-
-	defer back.Stop()
-
-	if err = back.Do(); err != nil {
-		log.Fatalf("backup do failed:%v", err)
+	if err != nil {
+		log.Fatal(err)
 	}
-
-	log.Println("backup to s3 success!")
-
-	if err = back.Repoter(); err != nil {
-		log.Fatalf("backup reporter failed:%v", err)
-	}
-
-	log.Println("backup reporter success!")
-
-	if err = back.Cleanup(); err != nil {
-		log.Fatalf("backup cleanup failed:%v", err)
-	}
-	log.Println("backup cleanup success!")
-
 	log.Printf("backup completed, please see reporter from [%s]!", back.RepoterPath())
 }
 
 func init() {
 	flag.Parse()
+
+	op_type = constant.OP_TYPE_BACKUP
+	if *r {
+		op_type = constant.OP_TYPE_RESTORE
+	}
 
 	if *ttl != "" {
 		//指定TTL时，默认按照toYYYYMMDD分区
@@ -102,4 +94,58 @@ func init() {
 
 	exe, _ := filepath.Abs(os.Args[0])
 	cwd = filepath.Dir(filepath.Dir(exe))
+}
+
+func ch2s3(back *backup.Backup) error {
+	var err error
+	if err = back.Init(); err != nil {
+		return err
+	}
+	log.Println("backup init success!")
+
+	defer back.Stop()
+
+	if err = back.Do(); err != nil {
+		return err
+	}
+
+	log.Println("backup to s3 success!")
+
+	if err = back.Repoter(); err != nil {
+		return err
+	}
+
+	log.Println("backup reporter success!")
+
+	if err = back.Cleanup(); err != nil {
+		return err
+	}
+	log.Println("backup cleanup success!")
+
+	return nil
+}
+func restore(back *backup.Backup) error {
+	var err error
+	if err = back.Init(); err != nil {
+		return err
+	}
+	log.Println("restore init success!")
+
+	defer back.Stop()
+
+	if err = back.Restore(); err != nil {
+		return err
+	}
+
+	log.Println("restore from s3 success!")
+
+	if err = back.Repoter(); err != nil {
+		return err
+	}
+
+	log.Println("restore reporter success!")
+
+	log.Println("restore cleanup success!")
+
+	return nil
 }

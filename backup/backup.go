@@ -9,6 +9,7 @@ import (
 
 	"github.com/YenchangChan/ch2s3/ch"
 	"github.com/YenchangChan/ch2s3/config"
+	"github.com/YenchangChan/ch2s3/constant"
 )
 
 type Backup struct {
@@ -76,6 +77,37 @@ func (this *Backup) Do() error {
 	return nil
 }
 
+// 备份表只能一个partition一个partition的备份，因为无法查询出全量的partition了
+func (this *Backup) Restore() error {
+	var err error
+	for _, table := range this.conf.ClickHouse.Tables {
+		statekey := fmt.Sprintf("%s.%s", this.conf.ClickHouse.Database, table)
+		this.states[statekey] = NewState(0, 0, 0, 1)
+
+		err = ch.Restore(this.conf.ClickHouse.Database, table, this.partition, this.conf.S3Disk)
+		if err != nil {
+			log.Printf("table %s restore failed: %v", statekey, err)
+			this.states[statekey].Failure(err)
+			return err
+		}
+
+		rows, err := ch.Rows(this.conf.ClickHouse.Database, table, this.partition, true)
+		if err != nil {
+			return err
+		}
+		buncsize, bczise, err := ch.Size(this.conf.ClickHouse.Database, table, this.partition, true)
+		if err != nil {
+			return err
+		}
+		this.states[statekey].Set(constant.STATE_ROWS, rows)
+		this.states[statekey].Set(constant.STATE_UNCOMPRESSED_SIZE, buncsize)
+		this.states[statekey].Set(constant.STATE_COMPRESSED_SIZE, bczise)
+		this.states[statekey].Success()
+		log.Printf("restore table %s done", statekey)
+	}
+	return nil
+}
+
 // 出具报表
 func (this *Backup) Repoter() error {
 	f, err := os.OpenFile(this.reporter, os.O_CREATE|os.O_RDWR|os.O_TRUNC, 0644)
@@ -94,7 +126,7 @@ func (this *Backup) Repoter() error {
 	f.WriteString("+--------------------------------+---------------+----------------+---------------+---------------+---------------+\n")
 	for k, v := range this.states {
 		f.WriteString(fmt.Sprintf("|%32s|%15d|%16s|%15s|%11d sec|%15s|\n", k, v.rows, formatReadableSize(v.buncsize), formatReadableSize(v.bcsize), v.elasped, status(v.extval)))
-		if v.extval == BACKUP_SUCCESS {
+		if v.extval == constant.BACKUP_SUCCESS {
 			ok_tables++
 		} else {
 			fail_tables++
@@ -110,7 +142,7 @@ func (this *Backup) Repoter() error {
 		f.WriteString("\nFailed Tables:\n")
 		i := 1
 		for k, v := range this.states {
-			if v.extval == BACKUP_FAILURE {
+			if v.extval == constant.BACKUP_FAILURE {
 				f.WriteString(fmt.Sprintf("[%d]%s\n", i, k))
 				f.WriteString(fmt.Sprintf("\t%v\n", v.why))
 				i++
@@ -139,4 +171,9 @@ func (this *Backup) Cleanup() error {
 
 func (this *Backup) Stop() {
 	ch.Close()
+}
+
+// 统计恢复之后的数据
+func (this *Backup) Check() {
+
 }
