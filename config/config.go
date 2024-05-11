@@ -64,7 +64,7 @@ func setDefaults(conf *Config) {
 	conf.S3Disk.RetryTimes = 0 //不重试
 }
 
-func DompConfig(c *Config) {
+func DumpConfig(c *Config) {
 	raw, err := json.MarshalIndent(c, "  ", "   ")
 	if err == nil {
 		log.Printf("%s", string(raw))

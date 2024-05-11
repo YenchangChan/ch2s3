@@ -34,7 +34,7 @@ func main() {
 		log.Fatalf("parse config failed:%v", err)
 	}
 
-	config.DompConfig(conf)
+	config.DumpConfig(conf)
 	current_partition_only := false
 	if *ttl == "" {
 		current_partition_only = true
