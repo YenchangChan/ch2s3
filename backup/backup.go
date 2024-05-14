@@ -55,6 +55,9 @@ func (this *Backup) Do() error {
 			partitions = strings.Split(this.partition, ",")
 		} else {
 			partitions, err = ch.Partitions(this.conf.ClickHouse.Database, table, this.partition, this.cponly)
+			if err != nil {
+				return err
+			}
 		}
 		this.states[statekey] = NewState(rows, buncsize, bczise, len(partitions))
 		ok := true
@@ -175,8 +178,24 @@ func (this *Backup) Cleanup() error {
 		//备份完成不清理本地数据
 		return nil
 	}
+
 	for _, table := range this.conf.ClickHouse.Tables {
-		_ = ch.Clean(this.conf.ClickHouse.Database, table, this.partition)
+		var err error
+		var partitions []string
+		if this.cponly {
+			partitions = strings.Split(this.partition, ",")
+		} else {
+			partitions, err = ch.Partitions(this.conf.ClickHouse.Database, table, this.partition, this.cponly)
+			if err != nil {
+				return err
+			}
+		}
+		for _, p := range partitions {
+			err = ch.Clean(this.conf.ClickHouse.Database, table, p)
+			if err != nil {
+				return err
+			}
+		}
 	}
 	return nil
 }
