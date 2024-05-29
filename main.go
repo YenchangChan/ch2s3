@@ -146,7 +146,5 @@ func restore(back *backup.Backup) error {
 
 	log.Println("restore reporter success!")
 
-	log.Println("restore cleanup success!")
-
 	return nil
 }

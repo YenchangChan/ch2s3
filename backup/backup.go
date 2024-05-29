@@ -180,6 +180,10 @@ func (this *Backup) Cleanup() error {
 	}
 
 	for _, table := range this.conf.ClickHouse.Tables {
+		// 备份失败，不删除数据
+		if this.states[fmt.Sprintf("%s.%s", this.conf.ClickHouse.Database, table)].extval == constant.BACKUP_FAILURE {
+			continue
+		}
 		var err error
 		var partitions []string
 		if this.cponly {
