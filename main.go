@@ -27,6 +27,7 @@ var (
 )
 
 func main() {
+	log.SetFlags(log.Llongfile)
 	log.Printf("ch2s3, partition: %s, cwd: %s, version: %s, build timestamp: %s, git hash: %s",
 		*partition, cwd, Version, BuildStamp, Githash)
 	conf, err := config.ParseConfig(cwd)
@@ -118,10 +119,10 @@ func ch2s3(back *backup.Backup) error {
 
 	log.Println("backup reporter success!")
 
-	if err = back.Cleanup(); err != nil {
-		return err
-	}
-	log.Println("backup cleanup success!")
+	// if err = back.Cleanup(); err != nil {
+	// 	return err
+	// }
+	// log.Println("backup cleanup success!")
 
 	return nil
 }

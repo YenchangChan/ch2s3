@@ -11,6 +11,7 @@ import (
 	"github.com/YenchangChan/ch2s3/ch"
 	"github.com/YenchangChan/ch2s3/config"
 	"github.com/YenchangChan/ch2s3/constant"
+	"github.com/YenchangChan/ch2s3/s3client"
 )
 
 type Backup struct {
@@ -34,7 +35,13 @@ func NewBack(conf *config.Config, op_type, partition, cwd string, cponly bool) *
 
 // 初始化备份条件，创建clickhouse连接，检查S3有效性
 func (this *Backup) Init() error {
-	//todo: 检查S3有效性
+	if this.conf.S3Disk.CleanIfFail {
+		err := s3client.NewSession(&this.conf.S3Disk)
+		if err != nil {
+			return err
+		}
+	}
+
 	return ch.Connect(this.conf.ClickHouse)
 }
 
@@ -66,10 +73,16 @@ func (this *Backup) Do() error {
 			err = ch.Ch2S3(this.conf.ClickHouse.Database, table, p, this.conf.S3Disk)
 			if err != nil {
 				// 失败即中止整张表的备份
-				log.Printf("table %s backup failed: %v", statekey, err)
+				log.Printf("table %s partition %s backup failed: %v", statekey, p, err)
 				this.states[statekey].Failure(err)
 				ok = false
-				break
+				continue
+			}
+			if this.conf.ClickHouse.Clean {
+				err = ch.Clean(this.conf.ClickHouse.Database, table, p)
+				if err != nil {
+					log.Printf("clean table %s partition %s failed: %v", statekey, p, err)
+				}
 			}
 		}
 		if ok {
@@ -181,7 +194,9 @@ func (this *Backup) Cleanup() error {
 
 	for _, table := range this.conf.ClickHouse.Tables {
 		// 备份失败，不删除数据
-		if this.states[fmt.Sprintf("%s.%s", this.conf.ClickHouse.Database, table)].extval == constant.BACKUP_FAILURE {
+		statekey := fmt.Sprintf("%s.%s", this.conf.ClickHouse.Database, table)
+		if this.states[statekey].extval == constant.BACKUP_FAILURE {
+			log.Printf("table %s backup failed, do not clean data", statekey)
 			continue
 		}
 		var err error

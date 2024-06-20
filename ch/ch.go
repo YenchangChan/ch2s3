@@ -11,6 +11,7 @@ import (
 	"github.com/ClickHouse/clickhouse-go/v2"
 	"github.com/ClickHouse/clickhouse-go/v2/lib/driver"
 	"github.com/YenchangChan/ch2s3/config"
+	"github.com/YenchangChan/ch2s3/s3client"
 	"github.com/avast/retry-go/v4"
 )
 
@@ -38,7 +39,7 @@ func Connect(conf config.Ch) error {
 				Compression: &clickhouse.Compression{
 					Method: clickhouse.CompressionLZ4,
 				},
-				ReadTimeout: 3600 * time.Second,
+				ReadTimeout: time.Duration(conf.ReadTimeout) * time.Second,
 			}
 			c, err := clickhouse.Open(&opts)
 			if err != nil {
@@ -219,16 +220,18 @@ func Partitions(database, table, partition string, cponly bool) ([]string, error
 BACKUP TABLE default.test_ck_dataq_r77 PARTITION '20230731' TO S3('http://192.168.101.94:49000/backup/20230731', 'VdmPbwvMlH8ryeqW', '8z16tUktXpvcjjy5M4MqXvCks5MMHb63')
 SETTINGS compression_method='lz4', compression_level=3
 */
-func genBackupSql(database, table, partition, host string, conf config.S3) string {
-	var sql string
+func genBackupSql(database, table, partition, host string, conf config.S3) (string, string) {
+	var key, sql string
 	sql = fmt.Sprintf("BACKUP TABLE `%s`.`%s` ", database, table)
 	if partition != "" {
 		sql += fmt.Sprintf(" PARTITION '%s'", partition)
 	}
-	sql += fmt.Sprintf(" TO S3('%s/%s/%s.%s/%s', '%s', '%s')",
-		conf.Endpoint, partition, database, table, host, conf.AccessKey, conf.SecretKey)
+	key = fmt.Sprintf("%s/%s.%s/%s",
+		partition, database, table, host)
+	sql += fmt.Sprintf(" TO S3('%s/%s', '%s', '%s')",
+		conf.Endpoint, key, conf.AccessKey, conf.SecretKey)
 	sql += fmt.Sprintf(" SETTINGS compression_method='%s', compression_level=%d", conf.CompressMethod, conf.CompressLevel)
-	return sql
+	return key, sql
 }
 
 /*
@@ -258,7 +261,7 @@ func Ch2S3(database, table, partition string, conf config.S3) error {
 		}
 		go func(conn Conn) {
 			defer wg.Done()
-			query := genBackupSql(database, table, partition, conn.h, conf)
+			key, query := genBackupSql(database, table, partition, conn.h, conf)
 			log.Printf("backup sql => [%s]%s", conn.h, query)
 			if err := retry.Do(
 				func() error {
@@ -281,6 +284,14 @@ func Ch2S3(database, table, partition string, conf config.S3) error {
 				retry.Attempts(conf.RetryTimes),
 				retry.Delay(10*time.Second),
 			); err != nil {
+				if conf.CleanIfFail {
+					// 删除s3上的不完整的数据
+					log.Printf("[%s] %v, try to clean", conn.h, err)
+					err = s3client.Remove(conf.Bucket, key)
+					if err != nil {
+						log.Printf("[%s] clean data %s from s3 failed:%v", conn.h, key, err)
+					}
+				}
 				lastErr = err
 				return
 			}
@@ -327,8 +338,8 @@ func Restore(database, table, partition string, conf config.S3) error {
 func Clean(database, table, partition string) error {
 	for i := range conns {
 		query := fmt.Sprintf("ALTER TABLE `%s`.`%s` DROP PARTITION '%s'", database, table, partition)
-		log.Printf("execute sql => %s", query)
 		conn, err := GetAvaliableConn(i)
+		log.Printf("execute sql => [%s]%s", conn.h, query)
 		if err != nil {
 			return err
 		}
