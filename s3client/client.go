@@ -37,7 +37,7 @@ func NewSession(conf *config.S3) error {
 		Endpoint:         aws.String(endpoint),
 		Region:           aws.String(conf.Region),
 		DisableSSL:       aws.Bool(true),
-		S3ForcePathStyle: aws.Bool(true),
+		S3ForcePathStyle: aws.Bool(conf.UsePathStyle),
 	})
 	if err != nil {
 		return err

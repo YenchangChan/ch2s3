@@ -54,6 +54,7 @@ ch2s3会通过报表的形式输出每次备份的结果，包含一共备份了
 |compress_level|3|压缩等级|
 |ignore_exists|true|如果S3上已有备份数据，是否报错，默认不报错， 仅当备份时该参数有效|
 |retry_times|0|备份失败重试次数，默认不重试|
+|use_path_style|true|S3 SDK 默认使用 virtual-hosted style 方式。但某些对象存储系统可能没开启或没支持virtual-hosted style 方式的访问，此时我们可以添加 use_path_style 参数来强制使用 path style 方式。比如 minio默认情况下只允许path style访问方式，所以在访问minio时要设置为true|
 ## 配置示例
 ```json
 {

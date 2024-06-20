@@ -19,6 +19,7 @@ type S3 struct {
 	IgnoreExists   bool   `json:"ignore_exists"` //如果S3上已存在不报错
 	RetryTimes     uint   `json:"retry_times"`
 	CleanIfFail    bool
+	UsePathStyle   bool `json:"use_path_style"`
 }
 
 type Ch struct {
@@ -68,6 +69,7 @@ func setDefaults(conf *Config) {
 	conf.S3Disk.CompressLevel = 3
 	conf.S3Disk.IgnoreExists = true
 	conf.S3Disk.RetryTimes = 0 //不重试
+	conf.S3Disk.UsePathStyle = true
 }
 
 func DumpConfig(c *Config) {
