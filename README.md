@@ -40,11 +40,14 @@ ch2s3会通过报表的形式输出每次备份的结果，包含一共备份了
 |clean|true|备份成功后是否删除掉本地数据|
 |database|default|需要备份的数据库|
 |tables||需要备份的表，数组形式，可以是多个表|
+|readTimeout|21600|client 连接超时时间， 默认6h|
 - s3
 
 | 配置项| 默认值| 说明|
 |------|------|-----|
 |endpoint||S3端点地址，需要带bucket名|
+|region||S3区域,当备份失败要删除远端s3不完整数据时，该配置必填|
+|cleanIfFail|false|备份失败是否删除S3数据|
 |accessKey||访问秘钥|
 |secretKey||秘钥|
 |compress_method|lz4|压缩算法，支持lz4, lz4hc, zstd,deflate_qpl|
