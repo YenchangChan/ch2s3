@@ -2,9 +2,9 @@ package backup
 
 import (
 	"fmt"
-	"log"
 
 	"github.com/YenchangChan/ch2s3/config"
+	"github.com/YenchangChan/ch2s3/log"
 	"golang.org/x/text/language"
 	"golang.org/x/text/message"
 )
@@ -23,7 +23,7 @@ func genBackupSql(database, table, partition, host string, conf config.S3) strin
 		conf.Endpoint, partition, host, database, table, conf.AccessKey, conf.SecretKey)
 
 	sql += fmt.Sprintf(" SETTINGS max_execution_time = 0, compression_method='%s', compression_level=%d", conf.CompressMethod, conf.CompressLevel)
-	log.Printf("backup sql => %s", sql)
+	log.Logger.Debugf("backup sql => %s", sql)
 	return sql
 }
 

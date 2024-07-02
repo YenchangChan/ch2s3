@@ -3,7 +3,6 @@ package config
 import (
 	"encoding/json"
 	"io"
-	"log"
 	"os"
 	"path"
 )
@@ -37,6 +36,7 @@ type Ch struct {
 type Config struct {
 	ClickHouse Ch
 	S3Disk     S3 `json:"s3"`
+	LogLevel   string
 }
 
 func ParseConfig(cwd string) (*Config, error) {
@@ -70,11 +70,6 @@ func setDefaults(conf *Config) {
 	conf.S3Disk.IgnoreExists = true
 	conf.S3Disk.RetryTimes = 0 //不重试
 	conf.S3Disk.UsePathStyle = true
-}
 
-func DumpConfig(c *Config) {
-	raw, err := json.MarshalIndent(c, "  ", "   ")
-	if err == nil {
-		log.Printf("%s", string(raw))
-	}
+	conf.LogLevel = "info"
 }

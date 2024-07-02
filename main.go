@@ -1,8 +1,8 @@
 package main
 
 import (
+	"encoding/json"
 	"flag"
-	"log"
 	"os"
 	"path/filepath"
 	"strconv"
@@ -12,6 +12,7 @@ import (
 	"github.com/YenchangChan/ch2s3/backup"
 	"github.com/YenchangChan/ch2s3/config"
 	"github.com/YenchangChan/ch2s3/constant"
+	"github.com/YenchangChan/ch2s3/log"
 )
 
 var (
@@ -27,15 +28,15 @@ var (
 )
 
 func main() {
-	log.SetFlags(log.Llongfile)
-	log.Printf("ch2s3, partition: %s, cwd: %s, version: %s, build timestamp: %s, git hash: %s",
-		*partition, cwd, Version, BuildStamp, Githash)
 	conf, err := config.ParseConfig(cwd)
 	if err != nil {
-		log.Fatalf("parse config failed:%v", err)
+		log.Logger.Panicf("parse config failed:%v", err)
 	}
+	log.InitLogger(conf.LogLevel)
+	log.Logger.Infof("ch2s3, partition: %s, cwd: %s, version: %s, build timestamp: %s, git hash: %s",
+		*partition, cwd, Version, BuildStamp, Githash)
 
-	config.DumpConfig(conf)
+	DumpConfig(conf)
 	current_partition_only := false
 	if *ttl == "" {
 		current_partition_only = true
@@ -48,9 +49,9 @@ func main() {
 		err = restore(back)
 	}
 	if err != nil {
-		log.Fatal(err)
+		log.Logger.Panic(err)
 	}
-	log.Printf("backup completed, please see reporter from [%s]!", back.RepoterPath())
+	log.Logger.Infof("backup completed, please see reporter from [%s]!", back.RepoterPath())
 }
 
 func init() {
@@ -91,7 +92,6 @@ func init() {
 
 	if *partition == "" {
 		*partition = time.Now().Format("20060102")
-		log.Printf("partition is empty, use today %s as partition", *partition)
 	}
 
 	exe, _ := filepath.Abs(os.Args[0])
@@ -103,7 +103,7 @@ func ch2s3(back *backup.Backup) error {
 	if err = back.Init(); err != nil {
 		return err
 	}
-	log.Println("backup init success!")
+	log.Logger.Infof("backup init success!")
 
 	defer back.Stop()
 
@@ -111,18 +111,13 @@ func ch2s3(back *backup.Backup) error {
 		return err
 	}
 
-	log.Println("backup to s3 success!")
+	log.Logger.Infof("backup to s3 success!")
 
 	if err = back.Repoter(op_type); err != nil {
 		return err
 	}
 
-	log.Println("backup reporter success!")
-
-	// if err = back.Cleanup(); err != nil {
-	// 	return err
-	// }
-	// log.Println("backup cleanup success!")
+	log.Logger.Infof("backup reporter success!")
 
 	return nil
 }
@@ -131,7 +126,7 @@ func restore(back *backup.Backup) error {
 	if err = back.Init(); err != nil {
 		return err
 	}
-	log.Println("restore init success!")
+	log.Logger.Infof("restore init success!")
 
 	defer back.Stop()
 
@@ -139,13 +134,20 @@ func restore(back *backup.Backup) error {
 		return err
 	}
 
-	log.Println("restore from s3 success!")
+	log.Logger.Infof("restore from s3 success!")
 
 	if err = back.Repoter(op_type); err != nil {
 		return err
 	}
 
-	log.Println("restore reporter success!")
+	log.Logger.Infof("restore reporter success!")
 
 	return nil
+}
+
+func DumpConfig(c *config.Config) {
+	raw, err := json.MarshalIndent(c, "  ", "   ")
+	if err == nil {
+		log.Logger.Infof("%s", string(raw))
+	}
 }

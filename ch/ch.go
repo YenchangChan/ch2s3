@@ -4,13 +4,13 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"log"
 	"sync"
 	"time"
 
 	"github.com/ClickHouse/clickhouse-go/v2"
 	"github.com/ClickHouse/clickhouse-go/v2/lib/driver"
 	"github.com/YenchangChan/ch2s3/config"
+	"github.com/YenchangChan/ch2s3/log"
 	"github.com/YenchangChan/ch2s3/s3client"
 	"github.com/avast/retry-go/v4"
 )
@@ -43,12 +43,12 @@ func Connect(conf config.Ch) error {
 			}
 			c, err := clickhouse.Open(&opts)
 			if err != nil {
-				log.Printf("[%s]connect failed: %v", replica, err)
+				log.Logger.Errorf("[%s]connect failed: %v", replica, err)
 				lastErr = err
 			}
 
 			if err = c.Ping(context.Background()); err != nil {
-				log.Printf("[%s]ping failed: %v", replica, err)
+				log.Logger.Errorf("[%s]ping failed: %v", replica, err)
 				lastErr = err
 			}
 			shardConns = append(shardConns, Conn{
@@ -106,7 +106,7 @@ func Size(database, table, partition string, cponly bool) (uint64, uint64, error
 	}
 	query := fmt.Sprintf("SELECT sum(data_uncompressed_bytes), sum(data_compressed_bytes) FROM system.parts WHERE partition %s '%s' AND database = '%s' AND table = '%s'",
 		op, partition, database, table)
-	log.Printf("execute sql => %s", query)
+	log.Logger.Debugf("execute sql => %s", query)
 	for i := range conns {
 		conn, err := GetAvaliableConn(i)
 		if err != nil {
@@ -127,7 +127,7 @@ func Size(database, table, partition string, cponly bool) (uint64, uint64, error
 		}(conn.c)
 	}
 	wg.Wait()
-	log.Printf("execute result => %v, %v", uncompressed_size, compressed_size)
+	log.Logger.Debugf("execute result => %v, %v", uncompressed_size, compressed_size)
 	return uncompressed_size, compressed_size, lastErr
 }
 
@@ -143,7 +143,7 @@ func Rows(database, table, partition string, cponly bool) (uint64, error) {
 	}
 	query := fmt.Sprintf("SELECT sum(rows) FROM system.parts WHERE partition %s '%s' AND database = '%s' AND table = '%s'",
 		op, partition, database, table)
-	log.Printf("execute sql => %s", query)
+	log.Logger.Debugf("execute sql => %s", query)
 	for i := range conns {
 		conn, err := GetAvaliableConn(i)
 		if err != nil {
@@ -163,7 +163,7 @@ func Rows(database, table, partition string, cponly bool) (uint64, error) {
 		}(conn.c)
 	}
 	wg.Wait()
-	log.Printf("execute result => %v", count)
+	log.Logger.Debugf("execute result => %v", count)
 	return count, lastErr
 }
 
@@ -180,7 +180,7 @@ func Partitions(database, table, partition string, cponly bool) ([]string, error
 	}
 	query := fmt.Sprintf("SELECT DISTINCT partition FROM system.parts WHERE partition %s '%s' AND database = '%s' AND table = '%s' ORDER BY partition",
 		op, partition, database, table)
-	log.Printf("execute sql => %s", query)
+	log.Logger.Debugf("execute sql => %s", query)
 	for i := range conns {
 		conn, err := GetAvaliableConn(i)
 		if err != nil {
@@ -212,7 +212,7 @@ func Partitions(database, table, partition string, cponly bool) ([]string, error
 	for p := range mp {
 		partitions = append(partitions, p)
 	}
-	log.Printf("execute result => %v", partitions)
+	log.Logger.Debugf("execute result => %v", partitions)
 	return partitions, lastErr
 }
 
@@ -262,7 +262,7 @@ func Ch2S3(database, table, partition string, conf config.S3) error {
 		go func(conn Conn) {
 			defer wg.Done()
 			key, query := genBackupSql(database, table, partition, conn.h, conf)
-			log.Printf("backup sql => [%s]%s", conn.h, query)
+			log.Logger.Infof("backup sql => [%s]%s", conn.h, query)
 			if err := retry.Do(
 				func() error {
 					tryClean := false
@@ -274,16 +274,16 @@ func Ch2S3(database, table, partition string, conf config.S3) error {
 							if exception.Code == 598 {
 								if tryClean {
 									if conf.IgnoreExists {
-										log.Printf("[%s] %v, ignore it", conn.h, exception.Message)
+										log.Logger.Warnf("[%s] %v, ignore it", conn.h, exception.Message)
 										return nil
 									} else {
 										return err
 									}
 								}
-								log.Printf("[%s] %v, try to clean from remote s3, and retry.", conn.h, exception.Message)
+								log.Logger.Warnf("[%s] %v, try to clean from remote s3, and retry.", conn.h, exception.Message)
 								err = s3client.Remove(conf.Bucket, key)
 								if err != nil {
-									log.Printf("[%s] clean data %s from s3 failed:%v", conn.h, key, err)
+									log.Logger.Errorf("[%s] clean data %s from s3 failed:%v", conn.h, key, err)
 								}
 								tryClean = true
 								goto CLEANED
@@ -291,7 +291,7 @@ func Ch2S3(database, table, partition string, conf config.S3) error {
 						}
 						return err
 					}
-					log.Printf("[%s]%s %s backup success", conn.h, key, partition)
+					log.Logger.Infof("[%s]%s %s backup success", conn.h, key, partition)
 					return nil
 				},
 				retry.LastErrorOnly(true),
@@ -300,10 +300,10 @@ func Ch2S3(database, table, partition string, conf config.S3) error {
 			); err != nil {
 				if conf.CleanIfFail {
 					// 删除s3上的不完整的数据
-					log.Printf("[%s] %v, try to clean", conn.h, err)
+					log.Logger.Warnf("[%s] %v, try to clean", conn.h, err)
 					err = s3client.Remove(conf.Bucket, key)
 					if err != nil {
-						log.Printf("[%s] clean data %s from s3 failed:%v", conn.h, key, err)
+						log.Logger.Errorf("[%s] clean data %s from s3 failed:%v", conn.h, key, err)
 					}
 				}
 				lastErr = err
@@ -327,7 +327,7 @@ func Restore(database, table, partition string, conf config.S3) error {
 		go func(conn Conn) {
 			defer wg.Done()
 			query := genResoreSql(database, table, partition, conn.h, conf)
-			log.Printf("restore sql => [%s]%s", conn.h, query)
+			log.Logger.Infof("restore sql => [%s]%s", conn.h, query)
 			if err := retry.Do(
 				func() error {
 					err := conn.c.Exec(context.Background(), query)
@@ -353,7 +353,7 @@ func Clean(database, table, partition string) error {
 	for i := range conns {
 		query := fmt.Sprintf("ALTER TABLE `%s`.`%s` DROP PARTITION '%s'", database, table, partition)
 		conn, err := GetAvaliableConn(i)
-		log.Printf("execute sql => [%s]%s", conn.h, query)
+		log.Logger.Infof("execute sql => [%s]%s", conn.h, query)
 		if err != nil {
 			return err
 		}

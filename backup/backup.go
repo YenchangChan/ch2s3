@@ -2,7 +2,6 @@ package backup
 
 import (
 	"fmt"
-	"log"
 	"os"
 	"path"
 	"strings"
@@ -11,6 +10,7 @@ import (
 	"github.com/YenchangChan/ch2s3/ch"
 	"github.com/YenchangChan/ch2s3/config"
 	"github.com/YenchangChan/ch2s3/constant"
+	"github.com/YenchangChan/ch2s3/log"
 	"github.com/YenchangChan/ch2s3/s3client"
 )
 
@@ -69,11 +69,11 @@ func (this *Backup) Do() error {
 		this.states[statekey] = NewState(rows, buncsize, bczise, len(partitions))
 		ok := true
 		for i, p := range partitions {
-			log.Printf("(%d/%d) table %s [%s] backup ", i+1, len(partitions), statekey, p)
+			log.Logger.Infof("(%d/%d) table %s [%s] backup ", i+1, len(partitions), statekey, p)
 			err = ch.Ch2S3(this.conf.ClickHouse.Database, table, p, this.conf.S3Disk)
 			if err != nil {
 				// 失败即中止整张表的备份
-				log.Printf("table %s partition %s backup failed: %v", statekey, p, err)
+				log.Logger.Errorf("table %s partition %s backup failed: %v", statekey, p, err)
 				this.states[statekey].Failure(err)
 				ok = false
 				continue
@@ -81,14 +81,14 @@ func (this *Backup) Do() error {
 			if this.conf.ClickHouse.Clean {
 				err = ch.Clean(this.conf.ClickHouse.Database, table, p)
 				if err != nil {
-					log.Printf("clean table %s partition %s failed: %v", statekey, p, err)
+					log.Logger.Errorf("clean table %s partition %s failed: %v", statekey, p, err)
 				}
 			}
 		}
 		if ok {
 			this.states[statekey].Success()
 		}
-		log.Printf("backup table %s done", statekey)
+		log.Logger.Infof("backup table %s done", statekey)
 	}
 
 	return nil
@@ -104,10 +104,10 @@ func (this *Backup) Restore() error {
 		this.states[statekey] = NewState(0, 0, 0, len(partitions))
 		var rows, buncsize, bcsize uint64
 		for i, p := range partitions {
-			log.Printf("(%d/%d) table %s [%s] restore ", i+1, len(partitions), statekey, p)
+			log.Logger.Infof("(%d/%d) table %s [%s] restore ", i+1, len(partitions), statekey, p)
 			err = ch.Restore(this.conf.ClickHouse.Database, table, p, this.conf.S3Disk)
 			if err != nil {
-				log.Printf("table %s restore failed: %v", statekey, err)
+				log.Logger.Errorf("table %s restore failed: %v", statekey, err)
 				this.states[statekey].Failure(err)
 				ok = false
 				break
@@ -131,7 +131,7 @@ func (this *Backup) Restore() error {
 		if ok {
 			this.states[statekey].Success()
 		}
-		log.Printf("restore table %s done", statekey)
+		log.Logger.Infof("restore table %s done", statekey)
 	}
 	return nil
 }
@@ -196,7 +196,7 @@ func (this *Backup) Cleanup() error {
 		// 备份失败，不删除数据
 		statekey := fmt.Sprintf("%s.%s", this.conf.ClickHouse.Database, table)
 		if this.states[statekey].extval == constant.BACKUP_FAILURE {
-			log.Printf("table %s backup failed, do not clean data", statekey)
+			log.Logger.Warnf("table %s backup failed, do not clean data", statekey)
 			continue
 		}
 		var err error
