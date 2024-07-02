@@ -265,19 +265,33 @@ func Ch2S3(database, table, partition string, conf config.S3) error {
 			log.Printf("backup sql => [%s]%s", conn.h, query)
 			if err := retry.Do(
 				func() error {
+					tryClean := false
+				CLEANED:
 					err := conn.c.Exec(context.Background(), query)
 					if err != nil {
-						if conf.IgnoreExists {
-							var exception *clickhouse.Exception
-							if errors.As(err, &exception) {
-								if exception.Code == 598 {
-									log.Printf("[%s] %v, ignore it", conn.h, exception.Message)
-									return nil
+						var exception *clickhouse.Exception
+						if errors.As(err, &exception) {
+							if exception.Code == 598 {
+								if tryClean {
+									if conf.IgnoreExists {
+										log.Printf("[%s] %v, ignore it", conn.h, exception.Message)
+										return nil
+									} else {
+										return err
+									}
 								}
+								log.Printf("[%s] %v, try to clean from remote s3, and retry.", conn.h, exception.Message)
+								err = s3client.Remove(conf.Bucket, key)
+								if err != nil {
+									log.Printf("[%s] clean data %s from s3 failed:%v", conn.h, key, err)
+								}
+								tryClean = true
+								goto CLEANED
 							}
 						}
 						return err
 					}
+					log.Printf("[%s]%s %s backup success", conn.h, key, partition)
 					return nil
 				},
 				retry.LastErrorOnly(true),

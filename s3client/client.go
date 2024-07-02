@@ -2,6 +2,7 @@ package s3client
 
 import (
 	"fmt"
+	"log"
 	"net/url"
 	"strings"
 
@@ -56,13 +57,16 @@ func Remove(bucket, key string) error {
 	}
 	for _, item := range resp.Contents {
 		if strings.HasPrefix(*item.Key, key) {
-			//log.Printf("%s need to delete\n", *item.Key)
+			log.Printf("%s need to delete\n", *item.Key)
 			_, err := svc.DeleteObject(&s3.DeleteObjectInput{
 				Bucket: aws.String(bucket),
 				Key:    item.Key,
 			})
 			if err != nil {
+				log.Printf("delete %s failed\n", *item.Key)
 				return err
+			} else {
+				log.Printf("%s deleted\n", *item.Key)
 			}
 		}
 	}
