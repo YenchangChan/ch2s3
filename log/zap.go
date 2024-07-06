@@ -8,7 +8,8 @@ import (
 var Logger *zap.SugaredLogger
 var ZapLog *zap.Logger
 
-func InitLogger(level string) {
+func InitLogger(level string, paths []string) {
+	var err error
 	cfg := zap.NewDevelopmentConfig()
 	cfg.Encoding = "console"
 	zaplevel := zapcore.InfoLevel
@@ -16,7 +17,13 @@ func InitLogger(level string) {
 	cfg.Level.SetLevel(zaplevel)
 	cfg.EncoderConfig.EncodeTime = zapcore.ISO8601TimeEncoder
 	cfg.EncoderConfig.EncodeLevel = zapcore.CapitalColorLevelEncoder
-	cfg.OutputPaths = []string{"stdout", "ch2s3.log"}
-	ZapLog, _ = cfg.Build()
+	if len(paths) == 0 {
+		paths = []string{"stdout"}
+	}
+	cfg.OutputPaths = paths
+	ZapLog, err = cfg.Build()
+	if err != nil {
+		panic(err)
+	}
 	Logger = ZapLog.Sugar()
 }

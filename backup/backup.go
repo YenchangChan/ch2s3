@@ -35,11 +35,9 @@ func NewBack(conf *config.Config, op_type, partition, cwd string, cponly bool) *
 
 // 初始化备份条件，创建clickhouse连接，检查S3有效性
 func (this *Backup) Init() error {
-	if this.conf.S3Disk.CleanIfFail {
-		err := s3client.NewSession(&this.conf.S3Disk)
-		if err != nil {
-			return err
-		}
+	err := s3client.NewSession(&this.conf.S3Disk)
+	if err != nil {
+		return err
 	}
 
 	return ch.Connect(this.conf.ClickHouse)
@@ -70,7 +68,8 @@ func (this *Backup) Do() error {
 		ok := true
 		for i, p := range partitions {
 			log.Logger.Infof("(%d/%d) table %s [%s] backup ", i+1, len(partitions), statekey, p)
-			err = ch.Ch2S3(this.conf.ClickHouse.Database, table, p, this.conf.S3Disk)
+			rsize, err := ch.Ch2S3(this.conf.ClickHouse.Database, table, p, this.conf.S3Disk)
+			this.states[statekey].Set(constant.STATE_REMOTE_SIZE, rsize)
 			if err != nil {
 				// 失败即中止整张表的备份
 				log.Logger.Errorf("table %s partition %s backup failed: %v", statekey, p, err)
@@ -149,11 +148,11 @@ func (this *Backup) Repoter(op_type string) error {
 	if err != nil {
 		return err
 	}
-	f.WriteString("+--------------------------------+---------------+------------------+-----------------+-----------+---------------+---------------+\n")
-	f.WriteString("|            table               |     rows      |size(uncompressed)| size(compressed)| partition |   elapsed     |    status     |\n")
-	f.WriteString("+--------------------------------+---------------+------------------+-----------------+-----------+---------------+---------------+\n")
+	f.WriteString("+--------------------------------+---------------+------------------+-----------------+-----------------+-----------+---------------+---------------+\n")
+	f.WriteString("|            table               |     rows      |size(uncompressed)| size(compressed)|  remote_size    | partition |   elapsed     |    status     |\n")
+	f.WriteString("+--------------------------------+---------------+------------------+-----------------+-----------------+-----------+---------------+---------------+\n")
 	for k, v := range this.states {
-		f.WriteString(fmt.Sprintf("|%32s|%15d|%18s|%17s|%11d|%11d sec|%15s|\n", k, v.rows, formatReadableSize(v.buncsize), formatReadableSize(v.bcsize), v.partitions, v.elasped, status(v.extval)))
+		f.WriteString(fmt.Sprintf("|%32s|%15d|%18s|%17s|%17s|%11d|%11d sec|%15s|\n", k, v.rows, formatReadableSize(v.buncsize), formatReadableSize(v.bcsize), formatReadableSize(v.rsize), v.partitions, v.elasped, status(v.extval)))
 		if v.extval == constant.BACKUP_SUCCESS {
 			ok_tables++
 		} else {
@@ -162,7 +161,7 @@ func (this *Backup) Repoter(op_type string) error {
 		total_bytes += v.buncsize
 		all_costs += v.elasped
 	}
-	f.WriteString("+--------------------------------+---------------+------------------+-----------------+-----------+---------------+---------------+\n")
+	f.WriteString("+--------------------------------+---------------+------------------+-----------------+-----------------+-----------+---------------+---------------+\n")
 
 	f.WriteString(fmt.Sprintf("\nTotal Tables: %d,  Success Tables: %d,  Failed Tables: %d,  Total Bytes: %s,  Elapsed: %d sec\n", ok_tables+fail_tables, ok_tables, fail_tables, formatReadableSize(total_bytes), all_costs))
 

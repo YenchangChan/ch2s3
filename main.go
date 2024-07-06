@@ -32,7 +32,7 @@ func main() {
 	if err != nil {
 		log.Logger.Panicf("parse config failed:%v", err)
 	}
-	log.InitLogger(conf.LogLevel)
+	log.InitLogger(conf.LogLevel, []string{"stdout", "ch2s3.log"})
 	log.Logger.Infof("ch2s3, partition: %s, cwd: %s, version: %s, build timestamp: %s, git hash: %s",
 		*partition, cwd, Version, BuildStamp, Githash)
 

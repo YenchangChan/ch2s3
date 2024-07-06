@@ -1,14 +1,22 @@
 package s3client
 
 import (
+	"context"
 	"fmt"
 	"net/url"
+	"os"
+	"path"
+	"path/filepath"
 	"strings"
+	"time"
 
 	"github.com/YenchangChan/ch2s3/config"
 	"github.com/YenchangChan/ch2s3/log"
+	"github.com/YenchangChan/ch2s3/utils"
 	"github.com/aws/aws-sdk-go/aws"
+	"github.com/aws/aws-sdk-go/aws/awserr"
 	"github.com/aws/aws-sdk-go/aws/credentials"
+	"github.com/aws/aws-sdk-go/aws/request"
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/s3"
 	_ "github.com/aws/aws-sdk-go/service/s3/s3manager"
@@ -16,6 +24,7 @@ import (
 
 var (
 	svc *s3.S3
+	sc  *session.Session
 )
 
 func NewSession(conf *config.S3) error {
@@ -30,10 +39,11 @@ func NewSession(conf *config.S3) error {
 	} else {
 		endpoint = conf.Endpoint
 	}
+	log.Logger.Infof("path: %s, endpoint: %s, bucket: %s\n", u.Path, endpoint, conf.Bucket)
 	if conf.Bucket == "" || conf.Region == "" {
 		return fmt.Errorf("bucket and region must not be empty")
 	}
-	sc, err := session.NewSession(&aws.Config{
+	sc, err = session.NewSession(&aws.Config{
 		Credentials:      credentials.NewStaticCredentials(conf.AccessKey, conf.SecretKey, ""),
 		Endpoint:         aws.String(endpoint),
 		Region:           aws.String(conf.Region),
@@ -49,7 +59,7 @@ func NewSession(conf *config.S3) error {
 
 func Remove(bucket, key string) error {
 	params := &s3.ListObjectsInput{
-		Bucket: aws.String("backup"),
+		Bucket: aws.String(bucket),
 	}
 	resp, err := svc.ListObjects(params)
 	if err != nil {
@@ -70,5 +80,95 @@ func Remove(bucket, key string) error {
 			}
 		}
 	}
+	return nil
+}
+
+func CheckSum(host string, bucket, key string, paths map[string]utils.PathInfo) (uint64, error) {
+	var rsize uint64
+	params := &s3.ListObjectsInput{
+		Bucket: aws.String(bucket),
+	}
+	log.Logger.Infof("bucket: %s, key: %s, len(paths): %d", bucket, key, len(paths))
+	resp, err := svc.ListObjects(params)
+	if err != nil {
+		return rsize, err
+	}
+	rpaths := make(map[string]string)
+	for _, item := range resp.Contents {
+		if strings.HasPrefix(*item.Key, key) {
+			checksum := strings.Trim(*item.ETag, "\"")
+			size := *item.Size
+			rsize += uint64(size)
+			rpaths[*item.Key] = checksum
+			log.Logger.Infof("remote s3 path: %s, checksum: %s", *item.Key, checksum)
+		}
+	}
+	for k, v := range paths {
+		if v.Host != host {
+			continue
+		}
+		if _, ok := rpaths[k]; ok {
+			if v.MD5 != rpaths[k] {
+				return rsize, fmt.Errorf("checksum mismatch for %s, expect %s, but got %s", k, v, rpaths[k])
+			}
+		} else {
+			return rsize, fmt.Errorf("file %s not found on s3", k)
+		}
+	}
+	return rsize, nil
+}
+
+func Upload(bucket, folderPath, key string, dryrun bool) error {
+	pool := utils.NewPoolDefault()
+	var lastErr error
+	defer pool.Close()
+	cnt := 0
+	start := time.Now()
+	err := filepath.Walk(folderPath, func(fpath string, info os.FileInfo, err error) error {
+		if err != nil {
+			log.Logger.Errorf("Error walking the path:%v", err)
+			return err
+		}
+
+		log.Logger.Debugf("Visiting:%v\n", fpath)
+
+		if !info.IsDir() {
+			pool.Submit(func() {
+				skey := path.Join(key, filepath.Base(fpath))
+				if !dryrun {
+					file, err := os.Open(fpath)
+					if err != nil {
+						log.Logger.Errorf("Error opening file:%v", err)
+						lastErr = err
+						return
+					}
+					defer file.Close()
+					_, err = svc.PutObjectWithContext(context.Background(), &s3.PutObjectInput{
+						Bucket: aws.String(bucket),
+						Key:    aws.String(skey),
+						Body:   file,
+					})
+					if err != nil {
+						if aerr, ok := err.(awserr.Error); ok && aerr.Code() == request.CanceledErrorCode {
+							lastErr = fmt.Errorf("upload canceled due to timeout, %v", err)
+							return
+						}
+						lastErr = fmt.Errorf("failed to upload object, %v", err)
+						return
+					}
+					cnt++
+				}
+				log.Logger.Infof("Uploaded:[%s] to [%s]", fpath, skey)
+			})
+		}
+		return lastErr
+	})
+	pool.Wait()
+
+	if err != nil {
+		log.Logger.Errorf("Error walking the folder: %v", err)
+		return err
+	}
+	log.Logger.Infof("%d files upload to s3 success! Elapsed: %v sec", cnt, time.Since(start).Seconds())
 	return nil
 }

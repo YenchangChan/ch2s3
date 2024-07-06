@@ -1,0 +1,764 @@
+2024-07-03T11:01:10.018+0800	[34mINFO[0m	s3client/client.go:139	Uploaded:%!(EXTRA string=test_ck_dataq_r30)
+2024-07-03T11:02:24.397+0800	[34mINFO[0m	s3client/client.go:139	Uploaded:test_ck_dataq_r30
+2024-07-03T11:02:52.875+0800	[31mERROR[0m	s3client/client.go:145	Error walking the folder:%!(EXTRA *s3err.RequestFailure=SignatureDoesNotMatch: The request signature we calculated does not match the signature you provided. Check your key and signing method.
+	status code: 403, request id: 17DE94DA43F0252C, host id: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855)
+github.com/YenchangChan/ch2s3/s3client.Upload
+	/root/chenyc/src/ch2s3/s3client/client.go:145
+main.main
+	/root/chenyc/src/ch2s3/cmd/s3uploader/main.go:42
+runtime.main
+	/usr/local/go/src/runtime/proc.go:267
+2024-07-03T11:03:37.351+0800	[31mERROR[0m	s3client/client.go:145	Error walking the folder: SignatureDoesNotMatch: The request signature we calculated does not match the signature you provided. Check your key and signing method.
+	status code: 403, request id: 17DE94E49F6B5D95, host id: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
+github.com/YenchangChan/ch2s3/s3client.Upload
+	/root/chenyc/src/ch2s3/s3client/client.go:145
+main.main
+	/root/chenyc/src/ch2s3/cmd/s3uploader/main.go:42
+runtime.main
+	/usr/local/go/src/runtime/proc.go:267
+2024-07-03T11:08:31.557+0800	[31mERROR[0m	s3client/client.go:135	Error uploading file:SignatureDoesNotMatch: The request signature we calculated does not match the signature you provided. Check your key and signing method.
+	status code: 403, request id: 17DE95291F820004, host id: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
+github.com/YenchangChan/ch2s3/s3client.Upload.func1
+	/root/chenyc/src/ch2s3/s3client/client.go:135
+path/filepath.walk
+	/usr/local/go/src/path/filepath/path.go:484
+path/filepath.Walk
+	/usr/local/go/src/path/filepath/path.go:579
+github.com/YenchangChan/ch2s3/s3client.Upload
+	/root/chenyc/src/ch2s3/s3client/client.go:114
+main.main
+	/root/chenyc/src/ch2s3/cmd/s3uploader/main.go:42
+runtime.main
+	/usr/local/go/src/runtime/proc.go:267
+2024-07-03T11:08:31.557+0800	[31mERROR[0m	s3client/client.go:145	Error walking the folder: SignatureDoesNotMatch: The request signature we calculated does not match the signature you provided. Check your key and signing method.
+	status code: 403, request id: 17DE95291F820004, host id: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
+github.com/YenchangChan/ch2s3/s3client.Upload
+	/root/chenyc/src/ch2s3/s3client/client.go:145
+main.main
+	/root/chenyc/src/ch2s3/cmd/s3uploader/main.go:42
+runtime.main
+	/usr/local/go/src/runtime/proc.go:267
+2024-07-03T11:10:30.883+0800	[31mERROR[0m	s3client/client.go:135	Error uploading file:SignatureDoesNotMatch: The request signature we calculated does not match the signature you provided. Check your key and signing method.
+	status code: 403, request id: 17DE9544E7E3B108, host id: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
+github.com/YenchangChan/ch2s3/s3client.Upload.func1
+	/root/chenyc/src/ch2s3/s3client/client.go:135
+path/filepath.walk
+	/usr/local/go/src/path/filepath/path.go:484
+path/filepath.Walk
+	/usr/local/go/src/path/filepath/path.go:579
+github.com/YenchangChan/ch2s3/s3client.Upload
+	/root/chenyc/src/ch2s3/s3client/client.go:114
+main.main
+	/root/chenyc/src/ch2s3/cmd/s3uploader/main.go:44
+runtime.main
+	/usr/local/go/src/runtime/proc.go:267
+2024-07-03T11:10:30.888+0800	[31mERROR[0m	s3client/client.go:145	Error walking the folder: SignatureDoesNotMatch: The request signature we calculated does not match the signature you provided. Check your key and signing method.
+	status code: 403, request id: 17DE9544E7E3B108, host id: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
+github.com/YenchangChan/ch2s3/s3client.Upload
+	/root/chenyc/src/ch2s3/s3client/client.go:145
+main.main
+	/root/chenyc/src/ch2s3/cmd/s3uploader/main.go:44
+runtime.main
+	/usr/local/go/src/runtime/proc.go:267
+2024-07-03T11:27:25.925+0800	[31mERROR[0m	s3client/client.go:135	Error uploading file:SignatureDoesNotMatch: The request signature we calculated does not match the signature you provided. Check your key and signing method.
+	status code: 403, request id: 17DE96313D102C15, host id: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
+github.com/YenchangChan/ch2s3/s3client.Upload.func1
+	/root/chenyc/src/ch2s3/s3client/client.go:135
+path/filepath.walk
+	/usr/local/go/src/path/filepath/path.go:484
+path/filepath.Walk
+	/usr/local/go/src/path/filepath/path.go:579
+github.com/YenchangChan/ch2s3/s3client.Upload
+	/root/chenyc/src/ch2s3/s3client/client.go:114
+main.main
+	/root/chenyc/src/ch2s3/cmd/s3uploader/main.go:44
+runtime.main
+	/usr/local/go/src/runtime/proc.go:267
+2024-07-03T11:27:25.925+0800	[31mERROR[0m	s3client/client.go:145	Error walking the folder: SignatureDoesNotMatch: The request signature we calculated does not match the signature you provided. Check your key and signing method.
+	status code: 403, request id: 17DE96313D102C15, host id: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
+github.com/YenchangChan/ch2s3/s3client.Upload
+	/root/chenyc/src/ch2s3/s3client/client.go:145
+main.main
+	/root/chenyc/src/ch2s3/cmd/s3uploader/main.go:44
+runtime.main
+	/usr/local/go/src/runtime/proc.go:267
+2024-07-03T15:13:43.058+0800	[31mERROR[0m	s3client/client.go:135	Error uploading file:SignatureDoesNotMatch: The request signature we calculated does not match the signature you provided. Check your key and signing method.
+	status code: 403, request id: 17DEA28A68A75252, host id: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
+github.com/YenchangChan/ch2s3/s3client.Upload.func1
+	/root/chenyc/src/ch2s3/s3client/client.go:135
+path/filepath.walk
+	/usr/local/go/src/path/filepath/path.go:484
+path/filepath.Walk
+	/usr/local/go/src/path/filepath/path.go:579
+github.com/YenchangChan/ch2s3/s3client.Upload
+	/root/chenyc/src/ch2s3/s3client/client.go:114
+main.main
+	/root/chenyc/src/ch2s3/cmd/s3uploader/main.go:49
+runtime.main
+	/usr/local/go/src/runtime/proc.go:267
+2024-07-03T15:13:43.059+0800	[31mERROR[0m	s3client/client.go:145	Error walking the folder: SignatureDoesNotMatch: The request signature we calculated does not match the signature you provided. Check your key and signing method.
+	status code: 403, request id: 17DEA28A68A75252, host id: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
+github.com/YenchangChan/ch2s3/s3client.Upload
+	/root/chenyc/src/ch2s3/s3client/client.go:145
+main.main
+	/root/chenyc/src/ch2s3/cmd/s3uploader/main.go:49
+runtime.main
+	/usr/local/go/src/runtime/proc.go:267
+2024-07-03T15:15:23.166+0800	[34mINFO[0m	s3client/client.go:138	Uploaded:test_ck_dataq_r30
+2024-07-03T15:16:47.353+0800	[34mINFO[0m	s3client/client.go:140	Uploaded:test_ck_dataq_r30
+2024-07-03T15:18:09.940+0800	[34mINFO[0m	s3client/client.go:140	Uploaded:quotas.list
+2024-07-03T15:18:09.940+0800	[34mINFO[0m	s3client/client.go:140	Uploaded:roles.list
+2024-07-03T15:18:09.940+0800	[34mINFO[0m	s3client/client.go:140	Uploaded:row_policies.list
+2024-07-03T15:18:09.940+0800	[34mINFO[0m	s3client/client.go:140	Uploaded:settings_profiles.list
+2024-07-03T15:18:09.941+0800	[34mINFO[0m	s3client/client.go:140	Uploaded:users.list
+2024-07-03T15:18:12.860+0800	[34mINFO[0m	s3client/client.go:140	Uploaded:format_version.txt
+2024-07-03T15:18:14.949+0800	[34mINFO[0m	s3client/client.go:140	Uploaded:format_version.txt
+2024-07-03T15:18:16.001+0800	[34mINFO[0m	s3client/client.go:140	Uploaded:ht_cmdb_all
+2024-07-03T15:18:16.555+0800	[34mINFO[0m	s3client/client.go:140	Uploaded:ht_cmdb_all_local
+2024-07-03T15:18:16.735+0800	[34mINFO[0m	s3client/client.go:140	Uploaded:ht_dbMachine
+2024-07-03T15:18:18.005+0800	[34mINFO[0m	s3client/client.go:140	Uploaded:ht_dbMachine2
+2024-07-03T15:18:18.949+0800	[34mINFO[0m	s3client/client.go:140	Uploaded:ht_dbMachine2_local
+2024-07-03T15:18:19.647+0800	[34mINFO[0m	s3client/client.go:140	Uploaded:ht_dbMachine_local
+2024-07-03T15:18:20.614+0800	[34mINFO[0m	s3client/client.go:140	Uploaded:ht_idx_metrics_series
+2024-07-03T15:18:20.853+0800	[34mINFO[0m	s3client/client.go:140	Uploaded:ht_idx_metrics_series_local
+2024-07-03T15:18:20.855+0800	[34mINFO[0m	s3client/client.go:140	Uploaded:ht_idx_metrics_value
+2024-07-03T15:18:21.638+0800	[34mINFO[0m	s3client/client.go:140	Uploaded:ht_idx_metrics_value_avg_recent_3d
+2024-07-03T15:18:21.778+0800	[34mINFO[0m	s3client/client.go:140	Uploaded:ht_idx_metrics_value_avg_recent_3d_local
+2024-07-03T15:18:22.750+0800	[34mINFO[0m	s3client/client.go:140	Uploaded:ht_idx_metrics_value_avg_recent_5d
+2024-07-03T15:18:22.949+0800	[34mINFO[0m	s3client/client.go:140	Uploaded:ht_idx_metrics_value_avg_recent_5d_local
+2024-07-03T15:18:23.357+0800	[34mINFO[0m	s3client/client.go:140	Uploaded:ht_idx_metrics_value_avg_trade_3d
+2024-07-03T15:18:24.059+0800	[34mINFO[0m	s3client/client.go:140	Uploaded:ht_idx_metrics_value_avg_trade_3d_local
+2024-07-03T15:18:42.071+0800	[34mINFO[0m	s3client/client.go:140	Uploaded:format_version.txt
+2024-07-03T15:18:42.071+0800	[34mINFO[0m	s3client/client.go:140	Uploaded:format_version.txt
+2024-07-03T15:18:42.071+0800	[34mINFO[0m	s3client/client.go:140	Uploaded:ht_cmdb_all
+2024-07-03T15:18:42.071+0800	[34mINFO[0m	s3client/client.go:140	Uploaded:ht_cmdb_all_local
+2024-07-03T15:18:42.071+0800	[34mINFO[0m	s3client/client.go:140	Uploaded:ht_dbMachine
+2024-07-03T15:18:42.071+0800	[34mINFO[0m	s3client/client.go:140	Uploaded:ht_dbMachine2
+2024-07-03T15:18:42.071+0800	[34mINFO[0m	s3client/client.go:140	Uploaded:ht_dbMachine2_local
+2024-07-03T15:18:42.071+0800	[34mINFO[0m	s3client/client.go:140	Uploaded:ht_dbMachine_local
+2024-07-03T15:18:42.071+0800	[34mINFO[0m	s3client/client.go:140	Uploaded:ht_idx_metrics_series
+2024-07-03T15:18:42.071+0800	[34mINFO[0m	s3client/client.go:140	Uploaded:ht_idx_metrics_series_local
+2024-07-03T15:18:42.071+0800	[34mINFO[0m	s3client/client.go:140	Uploaded:ht_idx_metrics_value
+2024-07-03T15:18:42.071+0800	[34mINFO[0m	s3client/client.go:140	Uploaded:ht_idx_metrics_value_avg_recent_3d
+2024-07-03T15:18:42.071+0800	[34mINFO[0m	s3client/client.go:140	Uploaded:ht_idx_metrics_value_avg_recent_3d_local
+2024-07-03T15:18:42.071+0800	[34mINFO[0m	s3client/client.go:140	Uploaded:ht_idx_metrics_value_avg_recent_5d
+2024-07-03T15:18:42.071+0800	[34mINFO[0m	s3client/client.go:140	Uploaded:ht_idx_metrics_value_avg_recent_5d_local
+2024-07-03T15:18:42.072+0800	[34mINFO[0m	s3client/client.go:140	Uploaded:ht_idx_metrics_value_avg_trade_3d
+2024-07-03T15:18:42.072+0800	[34mINFO[0m	s3client/client.go:140	Uploaded:ht_idx_metrics_value_avg_trade_3d_local
+2024-07-03T15:18:42.072+0800	[34mINFO[0m	s3client/client.go:140	Uploaded:ht_idx_metrics_value_avg_trade_5d
+2024-07-03T15:18:42.365+0800	[34mINFO[0m	s3client/client.go:140	Uploaded:ht_idx_metrics_value_avg_trade_5d_local
+2024-07-03T15:18:42.707+0800	[34mINFO[0m	s3client/client.go:140	Uploaded:ht_idx_metrics_value_local
+2024-07-03T15:18:43.601+0800	[34mINFO[0m	s3client/client.go:140	Uploaded:ht_midMachine
+2024-07-03T15:18:44.619+0800	[34mINFO[0m	s3client/client.go:140	Uploaded:ht_midMachine2
+2024-07-03T15:18:44.964+0800	[34mINFO[0m	s3client/client.go:140	Uploaded:ht_midMachine2_local
+2024-07-03T15:18:45.119+0800	[34mINFO[0m	s3client/client.go:140	Uploaded:ht_midMachine_local
+2024-07-03T15:18:45.262+0800	[34mINFO[0m	s3client/client.go:140	Uploaded:ht_network
+2024-07-03T15:18:45.558+0800	[34mINFO[0m	s3client/client.go:140	Uploaded:ht_network2
+2024-07-03T15:18:45.950+0800	[34mINFO[0m	s3client/client.go:140	Uploaded:ht_network2_local
+2024-07-03T15:18:45.995+0800	[34mINFO[0m	s3client/client.go:140	Uploaded:ht_network_local
+2024-07-03T15:18:46.007+0800	[34mINFO[0m	s3client/client.go:140	Uploaded:ht_osMachine
+2024-07-03T15:18:46.027+0800	[34mINFO[0m	s3client/client.go:140	Uploaded:ht_osMachine_local
+2024-07-03T15:18:46.836+0800	[34mINFO[0m	s3client/client.go:140	Uploaded:ht_phyMachine
+2024-07-03T15:18:47.563+0800	[34mINFO[0m	s3client/client.go:140	Uploaded:ht_phyMachine2
+2024-07-03T15:18:47.563+0800	[34mINFO[0m	s3client/client.go:140	Uploaded:ht_phyMachine2_local
+2024-07-03T15:18:47.861+0800	[34mINFO[0m	s3client/client.go:140	Uploaded:ht_phyMachine_local
+2024-07-03T15:18:47.934+0800	[34mINFO[0m	s3client/client.go:140	Uploaded:ht_properties
+2024-07-03T15:18:47.936+0800	[34mINFO[0m	s3client/client.go:140	Uploaded:ht_properties_local
+2024-07-03T15:18:48.097+0800	[34mINFO[0m	s3client/client.go:140	Uploaded:ht_sysInfo
+2024-07-03T15:18:48.802+0800	[34mINFO[0m	s3client/client.go:140	Uploaded:ht_sysInfo2
+2024-07-03T15:18:49.113+0800	[34mINFO[0m	s3client/client.go:140	Uploaded:ht_sysInfo2_local
+2024-07-03T15:18:51.625+0800	[34mINFO[0m	s3client/client.go:140	Uploaded:ht_sysInfo_local
+2024-07-03T15:18:52.222+0800	[34mINFO[0m	s3client/client.go:140	Uploaded:ht_sysMachine
+2024-07-03T15:18:52.769+0800	[34mINFO[0m	s3client/client.go:140	Uploaded:ht_sysMachine2
+2024-07-03T15:18:53.166+0800	[34mINFO[0m	s3client/client.go:140	Uploaded:ht_sysMachine2_local
+2024-07-03T15:18:53.469+0800	[34mINFO[0m	s3client/client.go:140	Uploaded:ht_sysMachine_all
+2024-07-03T15:18:53.470+0800	[34mINFO[0m	s3client/client.go:140	Uploaded:ht_sysMachine_all_local
+2024-07-03T15:18:54.171+0800	[34mINFO[0m	s3client/client.go:140	Uploaded:ht_sysMachine_local
+2024-07-03T15:18:55.535+0800	[34mINFO[0m	s3client/client.go:140	Uploaded:ht_sysModule
+2024-07-03T15:18:55.877+0800	[34mINFO[0m	s3client/client.go:140	Uploaded:ht_sysModule_local
+2024-07-03T15:18:56.422+0800	[34mINFO[0m	s3client/client.go:140	Uploaded:dim_application_trade_metric_1m
+2024-07-03T15:18:57.139+0800	[34mINFO[0m	s3client/client.go:140	Uploaded:dim_application_trade_metric_1m_local
+2024-07-03T15:18:57.459+0800	[34mINFO[0m	s3client/client.go:140	Uploaded:dim_application_trade_metric_series
+2024-07-03T15:18:57.578+0800	[34mINFO[0m	s3client/client.go:140	Uploaded:dim_application_trade_metric_series_local
+2024-07-03T15:18:58.317+0800	[34mINFO[0m	s3client/client.go:140	Uploaded:dwd_application_trade_detail
+2024-07-03T15:18:59.179+0800	[34mINFO[0m	s3client/client.go:140	Uploaded:dwd_application_trade_detail_local
+2024-07-03T15:19:00.713+0800	[34mINFO[0m	s3client/client.go:140	Uploaded:dwd_trade_all_detail_ck_local
+2024-07-03T15:19:01.556+0800	[34mINFO[0m	s3client/client.go:140	Uploaded:dws_application_trade_metric_1m
+2024-07-03T15:19:02.058+0800	[34mINFO[0m	s3client/client.go:140	Uploaded:dws_application_trade_metric_1m_local
+2024-07-03T15:19:04.226+0800	[34mINFO[0m	s3client/client.go:140	Uploaded:dws_application_trade_metric_avg
+2024-07-03T15:19:04.661+0800	[34mINFO[0m	s3client/client.go:140	Uploaded:dws_application_trade_metric_avg_local
+2024-07-03T15:19:07.194+0800	[34mINFO[0m	s3client/client.go:140	Uploaded:dws_application_trade_metric_peak
+2024-07-03T15:19:07.229+0800	[34mINFO[0m	s3client/client.go:140	Uploaded:dws_application_trade_metric_peak_local
+2024-07-03T15:19:09.101+0800	[34mINFO[0m	s3client/client.go:140	Uploaded:dws_ck_0125_01_series
+2024-07-03T15:19:09.458+0800	[34mINFO[0m	s3client/client.go:140	Uploaded:dws_ck_0125_01_series_local
+2024-07-03T15:19:10.114+0800	[34mINFO[0m	s3client/client.go:140	Uploaded:dws_ck_0125_01_value
+2024-07-03T15:19:10.277+0800	[34mINFO[0m	s3client/client.go:140	Uploaded:dws_ck_0125_01_value_local
+2024-07-03T15:19:10.573+0800	[34mINFO[0m	s3client/client.go:140	Uploaded:dws_ck_0125_02
+2024-07-03T15:19:10.888+0800	[34mINFO[0m	s3client/client.go:140	Uploaded:dws_ck_0125_02_local
+2024-07-03T15:19:11.779+0800	[34mINFO[0m	s3client/client.go:140	Uploaded:dws_ck_0125_03
+2024-07-03T15:19:11.819+0800	[34mINFO[0m	s3client/client.go:140	Uploaded:dws_ck_0125_03_local
+2024-07-03T15:19:12.054+0800	[34mINFO[0m	s3client/client.go:140	Uploaded:dws_ck_0125_04
+2024-07-03T15:19:14.144+0800	[34mINFO[0m	s3client/client.go:140	Uploaded:dws_ck_sys_metric_series
+2024-07-03T15:19:14.205+0800	[34mINFO[0m	s3client/client.go:140	Uploaded:dws_ck_sys_metric_series_local
+2024-07-03T15:19:15.382+0800	[34mINFO[0m	s3client/client.go:140	Uploaded:dws_ck_sys_metric_value
+2024-07-03T15:19:16.071+0800	[34mINFO[0m	s3client/client.go:140	Uploaded:dws_ck_sys_metric_value_local
+2024-07-03T15:19:16.287+0800	[34mINFO[0m	s3client/client.go:140	Uploaded:dws_ck_trade_sum_1m_series
+2024-07-03T15:19:16.664+0800	[34mINFO[0m	s3client/client.go:140	Uploaded:dws_ck_trade_sum_1m_series_local
+2024-07-03T15:19:17.873+0800	[34mINFO[0m	s3client/client.go:140	Uploaded:dws_ck_trade_sum_1m_value
+2024-07-03T15:19:18.687+0800	[34mINFO[0m	s3client/client.go:140	Uploaded:dws_ck_trade_sum_1m_value_local
+2024-07-03T15:19:18.919+0800	[34mINFO[0m	s3client/client.go:140	Uploaded:dws_monitor_trade_all_trade_1m_ck
+2024-07-03T15:19:19.312+0800	[34mINFO[0m	s3client/client.go:140	Uploaded:dws_monitor_trade_all_trade_1m_ck_local
+2024-07-03T15:19:20.715+0800	[34mINFO[0m	s3client/client.go:140	Uploaded:dws_monitor_trade_all_trade_1s_ck_clone_local
+2024-07-03T15:19:21.547+0800	[34mINFO[0m	s3client/client.go:140	Uploaded:dws_trade_metric_avg_ck
+2024-07-03T15:19:22.099+0800	[34mINFO[0m	s3client/client.go:140	Uploaded:dws_trade_metric_avg_ck_local
+2024-07-03T15:19:22.132+0800	[34mINFO[0m	s3client/client.go:140	Uploaded:table1
+2024-07-03T15:19:22.272+0800	[34mINFO[0m	s3client/client.go:140	Uploaded:table1_local
+2024-07-03T15:19:22.612+0800	[34mINFO[0m	s3client/client.go:140	Uploaded:table2
+2024-07-03T15:19:22.646+0800	[34mINFO[0m	s3client/client.go:140	Uploaded:table2_local
+2024-07-03T15:19:22.998+0800	[34mINFO[0m	s3client/client.go:140	Uploaded:tb122709
+2024-07-03T15:19:23.862+0800	[34mINFO[0m	s3client/client.go:140	Uploaded:tb122709_local
+2024-07-03T15:19:24.487+0800	[34mINFO[0m	s3client/client.go:140	Uploaded:wangdi002
+2024-07-03T15:19:24.767+0800	[34mINFO[0m	s3client/client.go:140	Uploaded:wangdi002_local
+2024-07-03T15:19:25.676+0800	[34mINFO[0m	s3client/client.go:140	Uploaded:wangdi0524
+2024-07-03T15:19:26.785+0800	[34mINFO[0m	s3client/client.go:140	Uploaded:wangdi0524_local
+2024-07-03T15:19:27.106+0800	[34mINFO[0m	s3client/client.go:140	Uploaded:wangdi0603_series
+2024-07-03T15:19:27.747+0800	[34mINFO[0m	s3client/client.go:140	Uploaded:wangdi0603_series_local
+2024-07-03T15:19:35.232+0800	[34mINFO[0m	s3client/client.go:140	Uploaded:test_ck_dataq_r30
+2024-07-03T15:20:24.219+0800	[34mINFO[0m	s3client/client.go:140	Uploaded:checksums.txt
+2024-07-03T15:20:24.220+0800	[34mINFO[0m	s3client/client.go:140	Uploaded:columns.txt
+2024-07-03T15:20:24.220+0800	[34mINFO[0m	s3client/client.go:140	Uploaded:count.txt
+2024-07-03T15:20:24.220+0800	[34mINFO[0m	s3client/client.go:140	Uploaded:data.bin
+2024-07-03T15:20:24.220+0800	[34mINFO[0m	s3client/client.go:140	Uploaded:data.mrk3
+2024-07-03T15:20:24.220+0800	[34mINFO[0m	s3client/client.go:140	Uploaded:default_compression_codec.txt
+2024-07-03T15:20:24.220+0800	[34mINFO[0m	s3client/client.go:140	Uploaded:minmax_timestamp.idx
+2024-07-03T15:20:24.221+0800	[34mINFO[0m	s3client/client.go:140	Uploaded:partition.dat
+2024-07-03T15:20:24.221+0800	[34mINFO[0m	s3client/client.go:140	Uploaded:primary.idx
+2024-07-03T15:20:24.336+0800	[34mINFO[0m	s3client/client.go:140	Uploaded:checksums.txt
+2024-07-03T15:20:24.336+0800	[34mINFO[0m	s3client/client.go:140	Uploaded:columns.txt
+2024-07-03T15:20:24.336+0800	[34mINFO[0m	s3client/client.go:140	Uploaded:count.txt
+2024-07-03T15:20:24.336+0800	[34mINFO[0m	s3client/client.go:140	Uploaded:data.bin
+2024-07-03T15:20:24.336+0800	[34mINFO[0m	s3client/client.go:140	Uploaded:data.mrk3
+2024-07-03T15:20:24.337+0800	[34mINFO[0m	s3client/client.go:140	Uploaded:default_compression_codec.txt
+2024-07-03T15:20:24.337+0800	[34mINFO[0m	s3client/client.go:140	Uploaded:minmax_timestamp.idx
+2024-07-03T15:20:24.337+0800	[34mINFO[0m	s3client/client.go:140	Uploaded:partition.dat
+2024-07-03T15:20:24.337+0800	[34mINFO[0m	s3client/client.go:140	Uploaded:primary.idx
+2024-07-03T15:20:24.353+0800	[34mINFO[0m	s3client/client.go:140	Uploaded:checksums.txt
+2024-07-03T15:20:24.353+0800	[34mINFO[0m	s3client/client.go:140	Uploaded:columns.txt
+2024-07-03T15:20:24.353+0800	[34mINFO[0m	s3client/client.go:140	Uploaded:count.txt
+2024-07-03T15:20:24.353+0800	[34mINFO[0m	s3client/client.go:140	Uploaded:data.bin
+2024-07-03T15:20:24.353+0800	[34mINFO[0m	s3client/client.go:140	Uploaded:data.mrk3
+2024-07-03T15:20:24.353+0800	[34mINFO[0m	s3client/client.go:140	Uploaded:default_compression_codec.txt
+2024-07-03T15:20:24.353+0800	[34mINFO[0m	s3client/client.go:140	Uploaded:minmax_timestamp.idx
+2024-07-03T15:20:24.353+0800	[34mINFO[0m	s3client/client.go:140	Uploaded:partition.dat
+2024-07-03T15:20:24.353+0800	[34mINFO[0m	s3client/client.go:140	Uploaded:primary.idx
+2024-07-03T15:20:24.368+0800	[34mINFO[0m	s3client/client.go:140	Uploaded:__series_id.bin
+2024-07-03T15:20:24.368+0800	[34mINFO[0m	s3client/client.go:140	Uploaded:__series_id.mrk2
+2024-07-03T15:20:24.368+0800	[34mINFO[0m	s3client/client.go:140	Uploaded:checksums.txt
+2024-07-03T15:20:24.368+0800	[34mINFO[0m	s3client/client.go:140	Uploaded:columns.txt
+2024-07-03T15:20:24.368+0800	[34mINFO[0m	s3client/client.go:140	Uploaded:count.txt
+2024-07-03T15:20:24.368+0800	[34mINFO[0m	s3client/client.go:140	Uploaded:default_compression_codec.txt
+2024-07-03T15:20:24.409+0800	[34mINFO[0m	s3client/client.go:140	Uploaded:dim00.bin
+2024-07-03T15:20:24.409+0800	[34mINFO[0m	s3client/client.go:140	Uploaded:dim00.mrk2
+2024-07-03T15:20:24.443+0800	[34mINFO[0m	s3client/client.go:140	Uploaded:dim01.bin
+2024-07-03T15:20:24.443+0800	[34mINFO[0m	s3client/client.go:140	Uploaded:dim01.mrk2
+2024-07-03T15:20:24.443+0800	[34mINFO[0m	s3client/client.go:140	Uploaded:dim02.bin
+2024-07-03T15:20:24.443+0800	[34mINFO[0m	s3client/client.go:140	Uploaded:dim02.mrk2
+2024-07-03T15:20:24.444+0800	[34mINFO[0m	s3client/client.go:140	Uploaded:dim03.bin
+2024-07-03T15:20:24.444+0800	[34mINFO[0m	s3client/client.go:140	Uploaded:dim03.mrk2
+2024-07-03T15:20:24.460+0800	[34mINFO[0m	s3client/client.go:140	Uploaded:dim04.bin
+2024-07-03T15:20:24.460+0800	[34mINFO[0m	s3client/client.go:140	Uploaded:dim04.mrk2
+2024-07-03T15:20:24.460+0800	[34mINFO[0m	s3client/client.go:140	Uploaded:dim05.bin
+2024-07-03T15:20:24.460+0800	[34mINFO[0m	s3client/client.go:140	Uploaded:dim05.mrk2
+2024-07-03T15:20:24.460+0800	[34mINFO[0m	s3client/client.go:140	Uploaded:dim06.bin
+2024-07-03T15:20:24.460+0800	[34mINFO[0m	s3client/client.go:140	Uploaded:dim06.mrk2
+2024-07-03T15:20:24.460+0800	[34mINFO[0m	s3client/client.go:140	Uploaded:dim07.bin
+2024-07-03T15:20:24.460+0800	[34mINFO[0m	s3client/client.go:140	Uploaded:dim07.mrk2
+2024-07-03T15:20:24.460+0800	[34mINFO[0m	s3client/client.go:140	Uploaded:dim08.bin
+2024-07-03T15:20:24.460+0800	[34mINFO[0m	s3client/client.go:140	Uploaded:dim08.mrk2
+2024-07-03T15:20:24.460+0800	[34mINFO[0m	s3client/client.go:140	Uploaded:dim09.bin
+2024-07-03T15:20:24.461+0800	[34mINFO[0m	s3client/client.go:140	Uploaded:dim09.mrk2
+2024-07-03T15:20:24.491+0800	[34mINFO[0m	s3client/client.go:140	Uploaded:dim10.bin
+2024-07-03T15:20:24.491+0800	[34mINFO[0m	s3client/client.go:140	Uploaded:dim10.mrk2
+2024-07-03T15:20:24.547+0800	[34mINFO[0m	s3client/client.go:140	Uploaded:dim11.bin
+2024-07-03T15:20:24.548+0800	[34mINFO[0m	s3client/client.go:140	Uploaded:dim11.mrk2
+2024-07-03T15:20:24.555+0800	[34mINFO[0m	s3client/client.go:140	Uploaded:dim12.bin
+2024-07-03T15:20:24.555+0800	[34mINFO[0m	s3client/client.go:140	Uploaded:dim12.mrk2
+2024-07-03T15:20:24.555+0800	[34mINFO[0m	s3client/client.go:140	Uploaded:dim13.bin
+2024-07-03T15:20:24.560+0800	[34mINFO[0m	s3client/client.go:140	Uploaded:dim13.mrk2
+2024-07-03T15:20:24.560+0800	[34mINFO[0m	s3client/client.go:140	Uploaded:dim14.bin
+2024-07-03T15:20:24.560+0800	[34mINFO[0m	s3client/client.go:140	Uploaded:dim14.mrk2
+2024-07-03T15:20:24.560+0800	[34mINFO[0m	s3client/client.go:140	Uploaded:dim15.bin
+2024-07-03T15:20:24.560+0800	[34mINFO[0m	s3client/client.go:140	Uploaded:dim15.mrk2
+2024-07-03T15:20:24.560+0800	[34mINFO[0m	s3client/client.go:140	Uploaded:dim16.bin
+2024-07-03T15:20:24.561+0800	[34mINFO[0m	s3client/client.go:140	Uploaded:dim16.mrk2
+2024-07-03T15:20:24.561+0800	[34mINFO[0m	s3client/client.go:140	Uploaded:dim17.bin
+2024-07-03T15:20:24.561+0800	[34mINFO[0m	s3client/client.go:140	Uploaded:dim17.mrk2
+2024-07-03T15:20:24.561+0800	[34mINFO[0m	s3client/client.go:140	Uploaded:dim18.bin
+2024-07-03T15:20:24.561+0800	[34mINFO[0m	s3client/client.go:140	Uploaded:dim18.mrk2
+2024-07-03T15:20:24.561+0800	[34mINFO[0m	s3client/client.go:140	Uploaded:dim19.bin
+2024-07-03T15:20:24.561+0800	[34mINFO[0m	s3client/client.go:140	Uploaded:dim19.mrk2
+2024-07-03T15:20:24.561+0800	[34mINFO[0m	s3client/client.go:140	Uploaded:metric00.bin
+2024-07-03T15:20:24.562+0800	[34mINFO[0m	s3client/client.go:140	Uploaded:metric00.mrk2
+2024-07-03T15:20:24.562+0800	[34mINFO[0m	s3client/client.go:140	Uploaded:metric01.bin
+2024-07-03T15:20:24.562+0800	[34mINFO[0m	s3client/client.go:140	Uploaded:metric01.mrk2
+2024-07-03T15:20:24.562+0800	[34mINFO[0m	s3client/client.go:140	Uploaded:metric02.bin
+2024-07-03T15:20:24.562+0800	[34mINFO[0m	s3client/client.go:140	Uploaded:metric02.mrk2
+2024-07-03T15:20:24.562+0800	[34mINFO[0m	s3client/client.go:140	Uploaded:metric03.bin
+2024-07-03T15:20:24.562+0800	[34mINFO[0m	s3client/client.go:140	Uploaded:metric03.mrk2
+2024-07-03T15:20:24.562+0800	[34mINFO[0m	s3client/client.go:140	Uploaded:minmax_timestamp.idx
+2024-07-03T15:20:24.562+0800	[34mINFO[0m	s3client/client.go:140	Uploaded:partition.dat
+2024-07-03T15:20:24.562+0800	[34mINFO[0m	s3client/client.go:140	Uploaded:primary.idx
+2024-07-03T15:20:24.562+0800	[34mINFO[0m	s3client/client.go:140	Uploaded:timestamp.bin
+2024-07-03T15:20:24.563+0800	[34mINFO[0m	s3client/client.go:140	Uploaded:timestamp.mrk2
+2024-07-03T15:20:24.703+0800	[34mINFO[0m	s3client/client.go:140	Uploaded:__series_id.bin
+2024-07-03T15:20:24.703+0800	[34mINFO[0m	s3client/client.go:140	Uploaded:__series_id.mrk2
+2024-07-03T15:20:24.703+0800	[34mINFO[0m	s3client/client.go:140	Uploaded:checksums.txt
+2024-07-03T15:20:24.703+0800	[34mINFO[0m	s3client/client.go:140	Uploaded:columns.txt
+2024-07-03T15:20:24.703+0800	[34mINFO[0m	s3client/client.go:140	Uploaded:count.txt
+2024-07-03T15:20:24.703+0800	[34mINFO[0m	s3client/client.go:140	Uploaded:default_compression_codec.txt
+2024-07-03T15:20:24.703+0800	[34mINFO[0m	s3client/client.go:140	Uploaded:dim00.bin
+2024-07-03T15:20:24.703+0800	[34mINFO[0m	s3client/client.go:140	Uploaded:dim00.mrk2
+2024-07-03T15:20:24.703+0800	[34mINFO[0m	s3client/client.go:140	Uploaded:dim01.bin
+2024-07-03T15:20:24.703+0800	[34mINFO[0m	s3client/client.go:140	Uploaded:dim01.mrk2
+2024-07-03T15:20:24.703+0800	[34mINFO[0m	s3client/client.go:140	Uploaded:dim02.bin
+2024-07-03T15:20:24.703+0800	[34mINFO[0m	s3client/client.go:140	Uploaded:dim02.mrk2
+2024-07-03T15:20:24.704+0800	[34mINFO[0m	s3client/client.go:140	Uploaded:dim03.bin
+2024-07-03T15:20:24.704+0800	[34mINFO[0m	s3client/client.go:140	Uploaded:dim03.mrk2
+2024-07-03T15:20:24.704+0800	[34mINFO[0m	s3client/client.go:140	Uploaded:dim04.bin
+2024-07-03T15:20:24.704+0800	[34mINFO[0m	s3client/client.go:140	Uploaded:dim04.mrk2
+2024-07-03T15:20:24.704+0800	[34mINFO[0m	s3client/client.go:140	Uploaded:dim05.bin
+2024-07-03T15:20:24.704+0800	[34mINFO[0m	s3client/client.go:140	Uploaded:dim05.mrk2
+2024-07-03T15:20:24.704+0800	[34mINFO[0m	s3client/client.go:140	Uploaded:dim06.bin
+2024-07-03T15:20:24.704+0800	[34mINFO[0m	s3client/client.go:140	Uploaded:dim06.mrk2
+2024-07-03T15:20:24.704+0800	[34mINFO[0m	s3client/client.go:140	Uploaded:dim07.bin
+2024-07-03T15:20:24.704+0800	[34mINFO[0m	s3client/client.go:140	Uploaded:dim07.mrk2
+2024-07-03T15:20:24.704+0800	[34mINFO[0m	s3client/client.go:140	Uploaded:dim08.bin
+2024-07-03T15:20:24.704+0800	[34mINFO[0m	s3client/client.go:140	Uploaded:dim08.mrk2
+2024-07-03T15:20:24.704+0800	[34mINFO[0m	s3client/client.go:140	Uploaded:dim09.bin
+2024-07-03T15:20:24.704+0800	[34mINFO[0m	s3client/client.go:140	Uploaded:dim09.mrk2
+2024-07-03T15:20:24.704+0800	[34mINFO[0m	s3client/client.go:140	Uploaded:dim10.bin
+2024-07-03T15:20:24.728+0800	[34mINFO[0m	s3client/client.go:140	Uploaded:dim10.mrk2
+2024-07-03T15:20:24.728+0800	[34mINFO[0m	s3client/client.go:140	Uploaded:dim11.bin
+2024-07-03T15:20:24.765+0800	[34mINFO[0m	s3client/client.go:140	Uploaded:dim11.mrk2
+2024-07-03T15:20:24.765+0800	[34mINFO[0m	s3client/client.go:140	Uploaded:dim12.bin
+2024-07-03T15:20:24.765+0800	[34mINFO[0m	s3client/client.go:140	Uploaded:dim12.mrk2
+2024-07-03T15:20:24.765+0800	[34mINFO[0m	s3client/client.go:140	Uploaded:dim13.bin
+2024-07-03T15:20:24.765+0800	[34mINFO[0m	s3client/client.go:140	Uploaded:dim13.mrk2
+2024-07-03T15:20:24.765+0800	[34mINFO[0m	s3client/client.go:140	Uploaded:dim14.bin
+2024-07-03T15:20:24.765+0800	[34mINFO[0m	s3client/client.go:140	Uploaded:dim14.mrk2
+2024-07-03T15:20:24.765+0800	[34mINFO[0m	s3client/client.go:140	Uploaded:dim15.bin
+2024-07-03T15:20:24.765+0800	[34mINFO[0m	s3client/client.go:140	Uploaded:dim15.mrk2
+2024-07-03T15:20:24.765+0800	[34mINFO[0m	s3client/client.go:140	Uploaded:dim16.bin
+2024-07-03T15:20:24.806+0800	[34mINFO[0m	s3client/client.go:140	Uploaded:dim16.mrk2
+2024-07-03T15:20:24.807+0800	[34mINFO[0m	s3client/client.go:140	Uploaded:dim17.bin
+2024-07-03T15:20:24.807+0800	[34mINFO[0m	s3client/client.go:140	Uploaded:dim17.mrk2
+2024-07-03T15:20:24.807+0800	[34mINFO[0m	s3client/client.go:140	Uploaded:dim18.bin
+2024-07-03T15:20:24.807+0800	[34mINFO[0m	s3client/client.go:140	Uploaded:dim18.mrk2
+2024-07-03T15:20:24.807+0800	[34mINFO[0m	s3client/client.go:140	Uploaded:dim19.bin
+2024-07-03T15:20:24.823+0800	[34mINFO[0m	s3client/client.go:140	Uploaded:dim19.mrk2
+2024-07-03T15:20:24.823+0800	[34mINFO[0m	s3client/client.go:140	Uploaded:metric00.bin
+2024-07-03T15:20:24.825+0800	[34mINFO[0m	s3client/client.go:140	Uploaded:metric00.mrk2
+2024-07-03T15:20:24.826+0800	[34mINFO[0m	s3client/client.go:140	Uploaded:metric01.bin
+2024-07-03T15:20:24.826+0800	[34mINFO[0m	s3client/client.go:140	Uploaded:metric01.mrk2
+2024-07-03T15:20:24.826+0800	[34mINFO[0m	s3client/client.go:140	Uploaded:metric02.bin
+2024-07-03T15:20:24.826+0800	[34mINFO[0m	s3client/client.go:140	Uploaded:metric02.mrk2
+2024-07-03T15:20:24.826+0800	[34mINFO[0m	s3client/client.go:140	Uploaded:metric03.bin
+2024-07-03T15:20:24.826+0800	[34mINFO[0m	s3client/client.go:140	Uploaded:metric03.mrk2
+2024-07-03T15:20:24.826+0800	[34mINFO[0m	s3client/client.go:140	Uploaded:minmax_timestamp.idx
+2024-07-03T15:20:24.826+0800	[34mINFO[0m	s3client/client.go:140	Uploaded:partition.dat
+2024-07-03T15:20:24.826+0800	[34mINFO[0m	s3client/client.go:140	Uploaded:primary.idx
+2024-07-03T15:20:24.826+0800	[34mINFO[0m	s3client/client.go:140	Uploaded:timestamp.bin
+2024-07-03T15:20:24.826+0800	[34mINFO[0m	s3client/client.go:140	Uploaded:timestamp.mrk2
+2024-07-03T15:20:24.844+0800	[34mINFO[0m	s3client/client.go:140	Uploaded:__series_id.bin
+2024-07-03T15:20:24.844+0800	[34mINFO[0m	s3client/client.go:140	Uploaded:__series_id.mrk2
+2024-07-03T15:20:24.865+0800	[34mINFO[0m	s3client/client.go:140	Uploaded:checksums.txt
+2024-07-03T15:20:24.865+0800	[34mINFO[0m	s3client/client.go:140	Uploaded:columns.txt
+2024-07-03T15:20:24.865+0800	[34mINFO[0m	s3client/client.go:140	Uploaded:count.txt
+2024-07-03T15:20:24.865+0800	[34mINFO[0m	s3client/client.go:140	Uploaded:default_compression_codec.txt
+2024-07-03T15:20:24.872+0800	[34mINFO[0m	s3client/client.go:140	Uploaded:dim00.bin
+2024-07-03T15:20:24.873+0800	[34mINFO[0m	s3client/client.go:140	Uploaded:dim00.mrk2
+2024-07-03T15:20:24.884+0800	[34mINFO[0m	s3client/client.go:140	Uploaded:dim01.bin
+2024-07-03T15:20:24.884+0800	[34mINFO[0m	s3client/client.go:140	Uploaded:dim01.mrk2
+2024-07-03T15:20:24.885+0800	[34mINFO[0m	s3client/client.go:140	Uploaded:dim02.bin
+2024-07-03T15:20:24.885+0800	[34mINFO[0m	s3client/client.go:140	Uploaded:dim02.mrk2
+2024-07-03T15:20:24.891+0800	[34mINFO[0m	s3client/client.go:140	Uploaded:dim03.bin
+2024-07-03T15:20:24.891+0800	[34mINFO[0m	s3client/client.go:140	Uploaded:dim03.mrk2
+2024-07-03T15:20:24.891+0800	[34mINFO[0m	s3client/client.go:140	Uploaded:dim04.bin
+2024-07-03T15:20:24.891+0800	[34mINFO[0m	s3client/client.go:140	Uploaded:dim04.mrk2
+2024-07-03T15:20:24.891+0800	[34mINFO[0m	s3client/client.go:140	Uploaded:dim05.bin
+2024-07-03T15:20:24.891+0800	[34mINFO[0m	s3client/client.go:140	Uploaded:dim05.mrk2
+2024-07-03T15:20:24.906+0800	[34mINFO[0m	s3client/client.go:140	Uploaded:dim06.bin
+2024-07-03T15:20:24.906+0800	[34mINFO[0m	s3client/client.go:140	Uploaded:dim06.mrk2
+2024-07-03T15:20:24.941+0800	[34mINFO[0m	s3client/client.go:140	Uploaded:dim07.bin
+2024-07-03T15:20:24.941+0800	[34mINFO[0m	s3client/client.go:140	Uploaded:dim07.mrk2
+2024-07-03T15:20:24.977+0800	[34mINFO[0m	s3client/client.go:140	Uploaded:dim08.bin
+2024-07-03T15:20:24.977+0800	[34mINFO[0m	s3client/client.go:140	Uploaded:dim08.mrk2
+2024-07-03T15:20:24.977+0800	[34mINFO[0m	s3client/client.go:140	Uploaded:dim09.bin
+2024-07-03T15:20:24.977+0800	[34mINFO[0m	s3client/client.go:140	Uploaded:dim09.mrk2
+2024-07-03T15:20:24.977+0800	[34mINFO[0m	s3client/client.go:140	Uploaded:dim10.bin
+2024-07-03T15:20:24.977+0800	[34mINFO[0m	s3client/client.go:140	Uploaded:dim10.mrk2
+2024-07-03T15:20:24.990+0800	[34mINFO[0m	s3client/client.go:140	Uploaded:dim11.bin
+2024-07-03T15:20:24.990+0800	[34mINFO[0m	s3client/client.go:140	Uploaded:dim11.mrk2
+2024-07-03T15:20:24.990+0800	[34mINFO[0m	s3client/client.go:140	Uploaded:dim12.bin
+2024-07-03T15:20:24.990+0800	[34mINFO[0m	s3client/client.go:140	Uploaded:dim12.mrk2
+2024-07-03T15:20:24.990+0800	[34mINFO[0m	s3client/client.go:140	Uploaded:dim13.bin
+2024-07-03T15:20:24.990+0800	[34mINFO[0m	s3client/client.go:140	Uploaded:dim13.mrk2
+2024-07-03T15:20:25.023+0800	[34mINFO[0m	s3client/client.go:140	Uploaded:dim14.bin
+2024-07-03T15:20:25.023+0800	[34mINFO[0m	s3client/client.go:140	Uploaded:dim14.mrk2
+2024-07-03T15:20:25.024+0800	[34mINFO[0m	s3client/client.go:140	Uploaded:dim15.bin
+2024-07-03T15:20:25.024+0800	[34mINFO[0m	s3client/client.go:140	Uploaded:dim15.mrk2
+2024-07-03T15:20:25.024+0800	[34mINFO[0m	s3client/client.go:140	Uploaded:dim16.bin
+2024-07-03T15:20:25.024+0800	[34mINFO[0m	s3client/client.go:140	Uploaded:dim16.mrk2
+2024-07-03T15:20:25.024+0800	[34mINFO[0m	s3client/client.go:140	Uploaded:dim17.bin
+2024-07-03T15:20:25.024+0800	[34mINFO[0m	s3client/client.go:140	Uploaded:dim17.mrk2
+2024-07-03T15:20:25.024+0800	[34mINFO[0m	s3client/client.go:140	Uploaded:dim18.bin
+2024-07-03T15:20:25.024+0800	[34mINFO[0m	s3client/client.go:140	Uploaded:dim18.mrk2
+2024-07-03T15:20:25.024+0800	[34mINFO[0m	s3client/client.go:140	Uploaded:dim19.bin
+2024-07-03T15:20:25.024+0800	[34mINFO[0m	s3client/client.go:140	Uploaded:dim19.mrk2
+2024-07-03T15:20:25.024+0800	[34mINFO[0m	s3client/client.go:140	Uploaded:metric00.bin
+2024-07-03T15:20:25.024+0800	[34mINFO[0m	s3client/client.go:140	Uploaded:metric00.mrk2
+2024-07-03T15:20:25.024+0800	[34mINFO[0m	s3client/client.go:140	Uploaded:metric01.bin
+2024-07-03T15:20:25.024+0800	[34mINFO[0m	s3client/client.go:140	Uploaded:metric01.mrk2
+2024-07-03T15:20:25.024+0800	[34mINFO[0m	s3client/client.go:140	Uploaded:metric02.bin
+2024-07-03T15:20:25.024+0800	[34mINFO[0m	s3client/client.go:140	Uploaded:metric02.mrk2
+2024-07-03T15:20:25.024+0800	[34mINFO[0m	s3client/client.go:140	Uploaded:metric03.bin
+2024-07-03T15:20:25.024+0800	[34mINFO[0m	s3client/client.go:140	Uploaded:metric03.mrk2
+2024-07-03T15:20:25.024+0800	[34mINFO[0m	s3client/client.go:140	Uploaded:minmax_timestamp.idx
+2024-07-03T15:20:25.024+0800	[34mINFO[0m	s3client/client.go:140	Uploaded:partition.dat
+2024-07-03T15:20:25.024+0800	[34mINFO[0m	s3client/client.go:140	Uploaded:primary.idx
+2024-07-03T15:20:25.024+0800	[34mINFO[0m	s3client/client.go:140	Uploaded:timestamp.bin
+2024-07-03T15:20:25.024+0800	[34mINFO[0m	s3client/client.go:140	Uploaded:timestamp.mrk2
+2024-07-03T15:20:25.038+0800	[34mINFO[0m	s3client/client.go:140	Uploaded:__series_id.bin
+2024-07-03T15:20:25.038+0800	[34mINFO[0m	s3client/client.go:140	Uploaded:__series_id.mrk2
+2024-07-03T15:20:25.046+0800	[34mINFO[0m	s3client/client.go:140	Uploaded:checksums.txt
+2024-07-03T15:20:25.047+0800	[34mINFO[0m	s3client/client.go:140	Uploaded:columns.txt
+2024-07-03T15:20:25.047+0800	[34mINFO[0m	s3client/client.go:140	Uploaded:count.txt
+2024-07-03T15:20:25.047+0800	[34mINFO[0m	s3client/client.go:140	Uploaded:default_compression_codec.txt
+2024-07-03T15:20:25.047+0800	[34mINFO[0m	s3client/client.go:140	Uploaded:dim00.bin
+2024-07-03T15:20:25.047+0800	[34mINFO[0m	s3client/client.go:140	Uploaded:dim00.mrk2
+2024-07-03T15:20:25.047+0800	[34mINFO[0m	s3client/client.go:140	Uploaded:dim01.bin
+2024-07-03T15:20:25.047+0800	[34mINFO[0m	s3client/client.go:140	Uploaded:dim01.mrk2
+2024-07-03T15:20:25.047+0800	[34mINFO[0m	s3client/client.go:140	Uploaded:dim02.bin
+2024-07-03T15:20:25.047+0800	[34mINFO[0m	s3client/client.go:140	Uploaded:dim02.mrk2
+2024-07-03T15:20:25.047+0800	[34mINFO[0m	s3client/client.go:140	Uploaded:dim03.bin
+2024-07-03T15:20:25.047+0800	[34mINFO[0m	s3client/client.go:140	Uploaded:dim03.mrk2
+2024-07-03T15:20:25.047+0800	[34mINFO[0m	s3client/client.go:140	Uploaded:dim04.bin
+2024-07-03T15:20:25.047+0800	[34mINFO[0m	s3client/client.go:140	Uploaded:dim04.mrk2
+2024-07-03T15:20:25.047+0800	[34mINFO[0m	s3client/client.go:140	Uploaded:dim05.bin
+2024-07-03T15:20:25.047+0800	[34mINFO[0m	s3client/client.go:140	Uploaded:dim05.mrk2
+2024-07-03T15:20:25.047+0800	[34mINFO[0m	s3client/client.go:140	Uploaded:dim06.bin
+2024-07-03T15:20:25.047+0800	[34mINFO[0m	s3client/client.go:140	Uploaded:dim06.mrk2
+2024-07-03T15:20:25.047+0800	[34mINFO[0m	s3client/client.go:140	Uploaded:dim07.bin
+2024-07-03T15:20:25.048+0800	[34mINFO[0m	s3client/client.go:140	Uploaded:dim07.mrk2
+2024-07-03T15:20:25.048+0800	[34mINFO[0m	s3client/client.go:140	Uploaded:dim08.bin
+2024-07-03T15:20:25.048+0800	[34mINFO[0m	s3client/client.go:140	Uploaded:dim08.mrk2
+2024-07-03T15:20:25.048+0800	[34mINFO[0m	s3client/client.go:140	Uploaded:dim09.bin
+2024-07-03T15:20:25.048+0800	[34mINFO[0m	s3client/client.go:140	Uploaded:dim09.mrk2
+2024-07-03T15:20:25.048+0800	[34mINFO[0m	s3client/client.go:140	Uploaded:dim10.bin
+2024-07-03T15:20:25.048+0800	[34mINFO[0m	s3client/client.go:140	Uploaded:dim10.mrk2
+2024-07-03T15:20:25.048+0800	[34mINFO[0m	s3client/client.go:140	Uploaded:dim11.bin
+2024-07-03T15:20:25.048+0800	[34mINFO[0m	s3client/client.go:140	Uploaded:dim11.mrk2
+2024-07-03T15:20:25.048+0800	[34mINFO[0m	s3client/client.go:140	Uploaded:dim12.bin
+2024-07-03T15:20:25.048+0800	[34mINFO[0m	s3client/client.go:140	Uploaded:dim12.mrk2
+2024-07-03T15:20:25.048+0800	[34mINFO[0m	s3client/client.go:140	Uploaded:dim13.bin
+2024-07-03T15:20:25.048+0800	[34mINFO[0m	s3client/client.go:140	Uploaded:dim13.mrk2
+2024-07-03T15:20:25.048+0800	[34mINFO[0m	s3client/client.go:140	Uploaded:dim14.bin
+2024-07-03T15:20:25.048+0800	[34mINFO[0m	s3client/client.go:140	Uploaded:dim14.mrk2
+2024-07-03T15:20:25.090+0800	[34mINFO[0m	s3client/client.go:140	Uploaded:dim15.bin
+2024-07-03T15:20:25.090+0800	[34mINFO[0m	s3client/client.go:140	Uploaded:dim15.mrk2
+2024-07-03T15:20:25.090+0800	[34mINFO[0m	s3client/client.go:140	Uploaded:dim16.bin
+2024-07-03T15:20:25.090+0800	[34mINFO[0m	s3client/client.go:140	Uploaded:dim16.mrk2
+2024-07-03T15:20:25.090+0800	[34mINFO[0m	s3client/client.go:140	Uploaded:dim17.bin
+2024-07-03T15:20:25.090+0800	[34mINFO[0m	s3client/client.go:140	Uploaded:dim17.mrk2
+2024-07-03T15:20:25.090+0800	[34mINFO[0m	s3client/client.go:140	Uploaded:dim18.bin
+2024-07-03T15:20:25.090+0800	[34mINFO[0m	s3client/client.go:140	Uploaded:dim18.mrk2
+2024-07-03T15:20:25.090+0800	[34mINFO[0m	s3client/client.go:140	Uploaded:dim19.bin
+2024-07-03T15:20:25.090+0800	[34mINFO[0m	s3client/client.go:140	Uploaded:dim19.mrk2
+2024-07-03T15:20:25.090+0800	[34mINFO[0m	s3client/client.go:140	Uploaded:metric00.bin
+2024-07-03T15:20:25.090+0800	[34mINFO[0m	s3client/client.go:140	Uploaded:metric00.mrk2
+2024-07-03T15:20:25.090+0800	[34mINFO[0m	s3client/client.go:140	Uploaded:metric01.bin
+2024-07-03T15:20:25.091+0800	[34mINFO[0m	s3client/client.go:140	Uploaded:metric01.mrk2
+2024-07-03T15:20:25.091+0800	[34mINFO[0m	s3client/client.go:140	Uploaded:metric02.bin
+2024-07-03T15:20:25.091+0800	[34mINFO[0m	s3client/client.go:140	Uploaded:metric02.mrk2
+2024-07-03T15:20:25.091+0800	[34mINFO[0m	s3client/client.go:140	Uploaded:metric03.bin
+2024-07-03T15:20:25.091+0800	[34mINFO[0m	s3client/client.go:140	Uploaded:metric03.mrk2
+2024-07-03T15:20:25.091+0800	[34mINFO[0m	s3client/client.go:140	Uploaded:minmax_timestamp.idx
+2024-07-03T15:20:25.091+0800	[34mINFO[0m	s3client/client.go:140	Uploaded:partition.dat
+2024-07-03T15:20:25.091+0800	[34mINFO[0m	s3client/client.go:140	Uploaded:primary.idx
+2024-07-03T15:20:25.091+0800	[34mINFO[0m	s3client/client.go:140	Uploaded:timestamp.bin
+2024-07-03T15:20:25.101+0800	[34mINFO[0m	s3client/client.go:140	Uploaded:timestamp.mrk2
+2024-07-03T15:20:25.156+0800	[34mINFO[0m	s3client/client.go:140	Uploaded:checksums.txt
+2024-07-03T15:20:25.156+0800	[34mINFO[0m	s3client/client.go:140	Uploaded:columns.txt
+2024-07-03T15:20:25.156+0800	[34mINFO[0m	s3client/client.go:140	Uploaded:count.txt
+2024-07-03T15:20:25.156+0800	[34mINFO[0m	s3client/client.go:140	Uploaded:data.bin
+2024-07-03T15:20:25.156+0800	[34mINFO[0m	s3client/client.go:140	Uploaded:data.mrk3
+2024-07-03T15:20:25.156+0800	[34mINFO[0m	s3client/client.go:140	Uploaded:default_compression_codec.txt
+2024-07-03T15:20:25.156+0800	[34mINFO[0m	s3client/client.go:140	Uploaded:minmax_timestamp.idx
+2024-07-03T15:20:25.156+0800	[34mINFO[0m	s3client/client.go:140	Uploaded:partition.dat
+2024-07-03T15:20:25.156+0800	[34mINFO[0m	s3client/client.go:140	Uploaded:primary.idx
+2024-07-03T15:20:25.156+0800	[34mINFO[0m	s3client/client.go:140	Uploaded:format_version.txt
+2024-07-03T15:20:53.304+0800	[34mINFO[0m	s3client/client.go:140	Uploaded:checksums.txt
+2024-07-03T15:20:53.304+0800	[34mINFO[0m	s3client/client.go:140	Uploaded:columns.txt
+2024-07-03T15:20:53.304+0800	[34mINFO[0m	s3client/client.go:140	Uploaded:count.txt
+2024-07-03T15:20:53.304+0800	[34mINFO[0m	s3client/client.go:140	Uploaded:data.bin
+2024-07-03T15:20:53.304+0800	[34mINFO[0m	s3client/client.go:140	Uploaded:data.mrk3
+2024-07-03T15:20:53.304+0800	[34mINFO[0m	s3client/client.go:140	Uploaded:default_compression_codec.txt
+2024-07-03T15:20:53.304+0800	[34mINFO[0m	s3client/client.go:140	Uploaded:minmax_timestamp.idx
+2024-07-03T15:20:53.304+0800	[34mINFO[0m	s3client/client.go:140	Uploaded:partition.dat
+2024-07-03T15:20:53.304+0800	[34mINFO[0m	s3client/client.go:140	Uploaded:primary.idx
+2024-07-03T15:21:59.636+0800	[34mINFO[0m	s3client/client.go:140	Uploaded:checksums.txt
+2024-07-03T15:21:59.636+0800	[34mINFO[0m	s3client/client.go:140	Uploaded:columns.txt
+2024-07-03T15:21:59.636+0800	[34mINFO[0m	s3client/client.go:140	Uploaded:count.txt
+2024-07-03T15:21:59.636+0800	[34mINFO[0m	s3client/client.go:140	Uploaded:data.bin
+2024-07-03T15:21:59.636+0800	[34mINFO[0m	s3client/client.go:140	Uploaded:data.mrk3
+2024-07-03T15:21:59.636+0800	[34mINFO[0m	s3client/client.go:140	Uploaded:default_compression_codec.txt
+2024-07-03T15:21:59.636+0800	[34mINFO[0m	s3client/client.go:140	Uploaded:minmax_timestamp.idx
+2024-07-03T15:21:59.636+0800	[34mINFO[0m	s3client/client.go:140	Uploaded:partition.dat
+2024-07-03T15:21:59.637+0800	[34mINFO[0m	s3client/client.go:140	Uploaded:primary.idx
+2024-07-03T16:09:12.254+0800	[34mINFO[0m	s3client/client.go:143	Uploaded:test_ck_dataq_r30
+2024-07-03T16:10:29.588+0800	[34mINFO[0m	s3client/client.go:143	Uploaded:__series_id.bin
+2024-07-03T16:10:29.588+0800	[34mINFO[0m	s3client/client.go:143	Uploaded:__series_id.mrk2
+2024-07-03T16:10:29.588+0800	[34mINFO[0m	s3client/client.go:143	Uploaded:checksums.txt
+2024-07-03T16:10:29.588+0800	[34mINFO[0m	s3client/client.go:143	Uploaded:columns.txt
+2024-07-03T16:10:29.589+0800	[34mINFO[0m	s3client/client.go:143	Uploaded:count.txt
+2024-07-03T16:10:29.589+0800	[34mINFO[0m	s3client/client.go:143	Uploaded:default_compression_codec.txt
+2024-07-03T16:10:29.589+0800	[34mINFO[0m	s3client/client.go:143	Uploaded:dim00.bin
+2024-07-03T16:10:29.589+0800	[34mINFO[0m	s3client/client.go:143	Uploaded:dim00.mrk2
+2024-07-03T16:10:29.589+0800	[34mINFO[0m	s3client/client.go:143	Uploaded:dim01.bin
+2024-07-03T16:10:29.589+0800	[34mINFO[0m	s3client/client.go:143	Uploaded:dim01.mrk2
+2024-07-03T16:10:29.589+0800	[34mINFO[0m	s3client/client.go:143	Uploaded:dim02.bin
+2024-07-03T16:10:29.589+0800	[34mINFO[0m	s3client/client.go:143	Uploaded:dim02.mrk2
+2024-07-03T16:10:29.589+0800	[34mINFO[0m	s3client/client.go:143	Uploaded:dim03.bin
+2024-07-03T16:10:29.589+0800	[34mINFO[0m	s3client/client.go:143	Uploaded:dim03.mrk2
+2024-07-03T16:10:29.589+0800	[34mINFO[0m	s3client/client.go:143	Uploaded:dim04.bin
+2024-07-03T16:10:29.589+0800	[34mINFO[0m	s3client/client.go:143	Uploaded:dim04.mrk2
+2024-07-03T16:10:29.589+0800	[34mINFO[0m	s3client/client.go:143	Uploaded:dim05.bin
+2024-07-03T16:10:29.589+0800	[34mINFO[0m	s3client/client.go:143	Uploaded:dim05.mrk2
+2024-07-03T16:10:29.589+0800	[34mINFO[0m	s3client/client.go:143	Uploaded:dim06.bin
+2024-07-03T16:10:29.589+0800	[34mINFO[0m	s3client/client.go:143	Uploaded:dim06.mrk2
+2024-07-03T16:10:29.589+0800	[34mINFO[0m	s3client/client.go:143	Uploaded:dim07.bin
+2024-07-03T16:10:29.589+0800	[34mINFO[0m	s3client/client.go:143	Uploaded:dim07.mrk2
+2024-07-03T16:10:29.589+0800	[34mINFO[0m	s3client/client.go:143	Uploaded:dim08.bin
+2024-07-03T16:10:29.589+0800	[34mINFO[0m	s3client/client.go:143	Uploaded:dim08.mrk2
+2024-07-03T16:10:29.589+0800	[34mINFO[0m	s3client/client.go:143	Uploaded:dim09.bin
+2024-07-03T16:10:29.589+0800	[34mINFO[0m	s3client/client.go:143	Uploaded:dim09.mrk2
+2024-07-03T16:10:29.589+0800	[34mINFO[0m	s3client/client.go:143	Uploaded:dim10.bin
+2024-07-03T16:10:29.589+0800	[34mINFO[0m	s3client/client.go:143	Uploaded:dim10.mrk2
+2024-07-03T16:10:29.589+0800	[34mINFO[0m	s3client/client.go:143	Uploaded:dim11.bin
+2024-07-03T16:10:29.589+0800	[34mINFO[0m	s3client/client.go:143	Uploaded:dim11.mrk2
+2024-07-03T16:10:29.589+0800	[34mINFO[0m	s3client/client.go:143	Uploaded:dim12.bin
+2024-07-03T16:10:29.589+0800	[34mINFO[0m	s3client/client.go:143	Uploaded:dim12.mrk2
+2024-07-03T16:10:29.589+0800	[34mINFO[0m	s3client/client.go:143	Uploaded:dim13.bin
+2024-07-03T16:10:29.589+0800	[34mINFO[0m	s3client/client.go:143	Uploaded:dim13.mrk2
+2024-07-03T16:10:29.589+0800	[34mINFO[0m	s3client/client.go:143	Uploaded:dim14.bin
+2024-07-03T16:10:29.590+0800	[34mINFO[0m	s3client/client.go:143	Uploaded:dim14.mrk2
+2024-07-03T16:10:29.590+0800	[34mINFO[0m	s3client/client.go:143	Uploaded:dim15.bin
+2024-07-03T16:10:29.590+0800	[34mINFO[0m	s3client/client.go:143	Uploaded:dim15.mrk2
+2024-07-03T16:10:29.590+0800	[34mINFO[0m	s3client/client.go:143	Uploaded:dim16.bin
+2024-07-03T16:10:29.590+0800	[34mINFO[0m	s3client/client.go:143	Uploaded:dim16.mrk2
+2024-07-03T16:10:29.590+0800	[34mINFO[0m	s3client/client.go:143	Uploaded:dim17.bin
+2024-07-03T16:10:29.590+0800	[34mINFO[0m	s3client/client.go:143	Uploaded:dim17.mrk2
+2024-07-03T16:10:29.590+0800	[34mINFO[0m	s3client/client.go:143	Uploaded:dim18.bin
+2024-07-03T16:10:29.590+0800	[34mINFO[0m	s3client/client.go:143	Uploaded:dim18.mrk2
+2024-07-03T16:10:29.590+0800	[34mINFO[0m	s3client/client.go:143	Uploaded:dim19.bin
+2024-07-03T16:10:29.590+0800	[34mINFO[0m	s3client/client.go:143	Uploaded:dim19.mrk2
+2024-07-03T16:10:29.590+0800	[34mINFO[0m	s3client/client.go:143	Uploaded:metric00.bin
+2024-07-03T16:10:29.590+0800	[34mINFO[0m	s3client/client.go:143	Uploaded:metric00.mrk2
+2024-07-03T16:10:29.590+0800	[34mINFO[0m	s3client/client.go:143	Uploaded:metric01.bin
+2024-07-03T16:10:29.590+0800	[34mINFO[0m	s3client/client.go:143	Uploaded:metric01.mrk2
+2024-07-03T16:10:29.590+0800	[34mINFO[0m	s3client/client.go:143	Uploaded:metric02.bin
+2024-07-03T16:10:29.590+0800	[34mINFO[0m	s3client/client.go:143	Uploaded:metric02.mrk2
+2024-07-03T16:10:29.590+0800	[34mINFO[0m	s3client/client.go:143	Uploaded:metric03.bin
+2024-07-03T16:10:29.590+0800	[34mINFO[0m	s3client/client.go:143	Uploaded:metric03.mrk2
+2024-07-03T16:10:29.590+0800	[34mINFO[0m	s3client/client.go:143	Uploaded:minmax_timestamp.idx
+2024-07-03T16:10:29.590+0800	[34mINFO[0m	s3client/client.go:143	Uploaded:partition.dat
+2024-07-03T16:10:29.590+0800	[34mINFO[0m	s3client/client.go:143	Uploaded:primary.idx
+2024-07-03T16:10:29.590+0800	[34mINFO[0m	s3client/client.go:143	Uploaded:timestamp.bin
+2024-07-03T16:10:29.590+0800	[34mINFO[0m	s3client/client.go:143	Uploaded:timestamp.mrk2
+2024-07-03T16:13:04.275+0800	[34mINFO[0m	s3client/client.go:143	Uploaded:backup/mytest/upload/__series_id.bin
+2024-07-03T16:13:04.275+0800	[34mINFO[0m	s3client/client.go:143	Uploaded:backup/mytest/upload/__series_id.mrk2
+2024-07-03T16:13:04.275+0800	[34mINFO[0m	s3client/client.go:143	Uploaded:backup/mytest/upload/checksums.txt
+2024-07-03T16:13:04.275+0800	[34mINFO[0m	s3client/client.go:143	Uploaded:backup/mytest/upload/columns.txt
+2024-07-03T16:13:04.275+0800	[34mINFO[0m	s3client/client.go:143	Uploaded:backup/mytest/upload/count.txt
+2024-07-03T16:13:04.275+0800	[34mINFO[0m	s3client/client.go:143	Uploaded:backup/mytest/upload/default_compression_codec.txt
+2024-07-03T16:13:04.275+0800	[34mINFO[0m	s3client/client.go:143	Uploaded:backup/mytest/upload/dim00.bin
+2024-07-03T16:13:04.275+0800	[34mINFO[0m	s3client/client.go:143	Uploaded:backup/mytest/upload/dim00.mrk2
+2024-07-03T16:13:04.275+0800	[34mINFO[0m	s3client/client.go:143	Uploaded:backup/mytest/upload/dim01.bin
+2024-07-03T16:13:04.276+0800	[34mINFO[0m	s3client/client.go:143	Uploaded:backup/mytest/upload/dim01.mrk2
+2024-07-03T16:13:04.276+0800	[34mINFO[0m	s3client/client.go:143	Uploaded:backup/mytest/upload/dim02.bin
+2024-07-03T16:13:04.276+0800	[34mINFO[0m	s3client/client.go:143	Uploaded:backup/mytest/upload/dim02.mrk2
+2024-07-03T16:13:04.276+0800	[34mINFO[0m	s3client/client.go:143	Uploaded:backup/mytest/upload/dim03.bin
+2024-07-03T16:13:04.276+0800	[34mINFO[0m	s3client/client.go:143	Uploaded:backup/mytest/upload/dim03.mrk2
+2024-07-03T16:13:04.276+0800	[34mINFO[0m	s3client/client.go:143	Uploaded:backup/mytest/upload/dim04.bin
+2024-07-03T16:13:04.276+0800	[34mINFO[0m	s3client/client.go:143	Uploaded:backup/mytest/upload/dim04.mrk2
+2024-07-03T16:13:04.276+0800	[34mINFO[0m	s3client/client.go:143	Uploaded:backup/mytest/upload/dim05.bin
+2024-07-03T16:13:04.276+0800	[34mINFO[0m	s3client/client.go:143	Uploaded:backup/mytest/upload/dim05.mrk2
+2024-07-03T16:13:04.276+0800	[34mINFO[0m	s3client/client.go:143	Uploaded:backup/mytest/upload/dim06.bin
+2024-07-03T16:13:04.276+0800	[34mINFO[0m	s3client/client.go:143	Uploaded:backup/mytest/upload/dim06.mrk2
+2024-07-03T16:13:04.276+0800	[34mINFO[0m	s3client/client.go:143	Uploaded:backup/mytest/upload/dim07.bin
+2024-07-03T16:13:04.276+0800	[34mINFO[0m	s3client/client.go:143	Uploaded:backup/mytest/upload/dim07.mrk2
+2024-07-03T16:13:04.276+0800	[34mINFO[0m	s3client/client.go:143	Uploaded:backup/mytest/upload/dim08.bin
+2024-07-03T16:13:04.276+0800	[34mINFO[0m	s3client/client.go:143	Uploaded:backup/mytest/upload/dim08.mrk2
+2024-07-03T16:13:04.276+0800	[34mINFO[0m	s3client/client.go:143	Uploaded:backup/mytest/upload/dim09.bin
+2024-07-03T16:13:04.276+0800	[34mINFO[0m	s3client/client.go:143	Uploaded:backup/mytest/upload/dim09.mrk2
+2024-07-03T16:13:04.276+0800	[34mINFO[0m	s3client/client.go:143	Uploaded:backup/mytest/upload/dim10.bin
+2024-07-03T16:13:04.276+0800	[34mINFO[0m	s3client/client.go:143	Uploaded:backup/mytest/upload/dim10.mrk2
+2024-07-03T16:13:04.276+0800	[34mINFO[0m	s3client/client.go:143	Uploaded:backup/mytest/upload/dim11.bin
+2024-07-03T16:13:04.276+0800	[34mINFO[0m	s3client/client.go:143	Uploaded:backup/mytest/upload/dim11.mrk2
+2024-07-03T16:13:04.276+0800	[34mINFO[0m	s3client/client.go:143	Uploaded:backup/mytest/upload/dim12.bin
+2024-07-03T16:13:04.276+0800	[34mINFO[0m	s3client/client.go:143	Uploaded:backup/mytest/upload/dim12.mrk2
+2024-07-03T16:13:04.276+0800	[34mINFO[0m	s3client/client.go:143	Uploaded:backup/mytest/upload/dim13.bin
+2024-07-03T16:13:04.276+0800	[34mINFO[0m	s3client/client.go:143	Uploaded:backup/mytest/upload/dim13.mrk2
+2024-07-03T16:13:04.276+0800	[34mINFO[0m	s3client/client.go:143	Uploaded:backup/mytest/upload/dim14.bin
+2024-07-03T16:13:04.276+0800	[34mINFO[0m	s3client/client.go:143	Uploaded:backup/mytest/upload/dim14.mrk2
+2024-07-03T16:13:04.276+0800	[34mINFO[0m	s3client/client.go:143	Uploaded:backup/mytest/upload/dim15.bin
+2024-07-03T16:13:04.276+0800	[34mINFO[0m	s3client/client.go:143	Uploaded:backup/mytest/upload/dim15.mrk2
+2024-07-03T16:13:04.276+0800	[34mINFO[0m	s3client/client.go:143	Uploaded:backup/mytest/upload/dim16.bin
+2024-07-03T16:13:04.276+0800	[34mINFO[0m	s3client/client.go:143	Uploaded:backup/mytest/upload/dim16.mrk2
+2024-07-03T16:13:04.276+0800	[34mINFO[0m	s3client/client.go:143	Uploaded:backup/mytest/upload/dim17.bin
+2024-07-03T16:13:04.277+0800	[34mINFO[0m	s3client/client.go:143	Uploaded:backup/mytest/upload/dim17.mrk2
+2024-07-03T16:13:04.277+0800	[34mINFO[0m	s3client/client.go:143	Uploaded:backup/mytest/upload/dim18.bin
+2024-07-03T16:13:04.277+0800	[34mINFO[0m	s3client/client.go:143	Uploaded:backup/mytest/upload/dim18.mrk2
+2024-07-03T16:13:04.277+0800	[34mINFO[0m	s3client/client.go:143	Uploaded:backup/mytest/upload/dim19.bin
+2024-07-03T16:13:04.277+0800	[34mINFO[0m	s3client/client.go:143	Uploaded:backup/mytest/upload/dim19.mrk2
+2024-07-03T16:13:04.277+0800	[34mINFO[0m	s3client/client.go:143	Uploaded:backup/mytest/upload/metric00.bin
+2024-07-03T16:13:04.277+0800	[34mINFO[0m	s3client/client.go:143	Uploaded:backup/mytest/upload/metric00.mrk2
+2024-07-03T16:13:04.277+0800	[34mINFO[0m	s3client/client.go:143	Uploaded:backup/mytest/upload/metric01.bin
+2024-07-03T16:13:04.277+0800	[34mINFO[0m	s3client/client.go:143	Uploaded:backup/mytest/upload/metric01.mrk2
+2024-07-03T16:13:04.277+0800	[34mINFO[0m	s3client/client.go:143	Uploaded:backup/mytest/upload/metric02.bin
+2024-07-03T16:13:04.277+0800	[34mINFO[0m	s3client/client.go:143	Uploaded:backup/mytest/upload/metric02.mrk2
+2024-07-03T16:13:04.277+0800	[34mINFO[0m	s3client/client.go:143	Uploaded:backup/mytest/upload/metric03.bin
+2024-07-03T16:13:04.277+0800	[34mINFO[0m	s3client/client.go:143	Uploaded:backup/mytest/upload/metric03.mrk2
+2024-07-03T16:13:04.277+0800	[34mINFO[0m	s3client/client.go:143	Uploaded:backup/mytest/upload/minmax_timestamp.idx
+2024-07-03T16:13:04.277+0800	[34mINFO[0m	s3client/client.go:143	Uploaded:backup/mytest/upload/partition.dat
+2024-07-03T16:13:04.277+0800	[34mINFO[0m	s3client/client.go:143	Uploaded:backup/mytest/upload/primary.idx
+2024-07-03T16:13:04.277+0800	[34mINFO[0m	s3client/client.go:143	Uploaded:backup/mytest/upload/timestamp.bin
+2024-07-03T16:13:04.277+0800	[34mINFO[0m	s3client/client.go:143	Uploaded:backup/mytest/upload/timestamp.mrk2
+2024-07-03T16:14:03.171+0800	[34mINFO[0m	s3client/client.go:146	Uploaded:backup/mytest/upload/__series_id.bin
+2024-07-03T16:14:03.232+0800	[34mINFO[0m	s3client/client.go:146	Uploaded:backup/mytest/upload/__series_id.mrk2
+2024-07-03T16:14:03.775+0800	[34mINFO[0m	s3client/client.go:146	Uploaded:backup/mytest/upload/checksums.txt
+2024-07-03T16:14:03.786+0800	[34mINFO[0m	s3client/client.go:146	Uploaded:backup/mytest/upload/columns.txt
+2024-07-03T16:14:05.173+0800	[34mINFO[0m	s3client/client.go:146	Uploaded:backup/mytest/upload/count.txt
+2024-07-03T16:14:05.991+0800	[34mINFO[0m	s3client/client.go:146	Uploaded:backup/mytest/upload/default_compression_codec.txt
+2024-07-03T16:16:14.569+0800	[34mINFO[0m	s3client/client.go:146	Uploaded:backup/mytest/upload/dim00.bin
+2024-07-03T16:16:14.709+0800	[34mINFO[0m	s3client/client.go:146	Uploaded:backup/mytest/upload/dim00.mrk2
+2024-07-03T16:19:09.660+0800	[34mINFO[0m	s3client/client.go:146	Uploaded:backup/mytest/upload/dim01.bin
+2024-07-03T16:19:10.132+0800	[34mINFO[0m	s3client/client.go:146	Uploaded:backup/mytest/upload/dim01.mrk2
+2024-07-03T16:22:09.250+0800	[34mINFO[0m	s3client/client.go:146	Uploaded:backup/mytest/upload/dim02.bin
+2024-07-03T16:22:09.979+0800	[34mINFO[0m	s3client/client.go:146	Uploaded:backup/mytest/upload/dim02.mrk2
+2024-07-03T16:25:42.510+0800	[34mINFO[0m	s3client/client.go:146	Uploaded:backup/mytest/upload/dim03.bin
+2024-07-03T16:25:42.817+0800	[34mINFO[0m	s3client/client.go:146	Uploaded:backup/mytest/upload/dim03.mrk2
+2024-07-03T16:42:26.846+0800	[34mINFO[0m	s3client/client.go:154	Uploaded:backup/mytest/upload/__series_id.bin
+2024-07-03T16:42:26.851+0800	[34mINFO[0m	s3client/client.go:154	Uploaded:backup/mytest/upload/__series_id.mrk2
+2024-07-03T16:42:26.864+0800	[34mINFO[0m	s3client/client.go:154	Uploaded:backup/mytest/upload/checksums.txt
+2024-07-03T16:42:26.869+0800	[34mINFO[0m	s3client/client.go:154	Uploaded:backup/mytest/upload/columns.txt
+2024-07-03T16:42:26.898+0800	[34mINFO[0m	s3client/client.go:154	Uploaded:backup/mytest/upload/count.txt
+2024-07-03T16:42:26.921+0800	[34mINFO[0m	s3client/client.go:154	Uploaded:backup/mytest/upload/default_compression_codec.txt
+2024-07-03T16:43:13.514+0800	[34mINFO[0m	s3client/client.go:154	Uploaded:backup/mytest/upload/checksums.txt
+2024-07-03T16:43:13.515+0800	[34mINFO[0m	s3client/client.go:154	Uploaded:backup/mytest/upload/columns.txt
+2024-07-03T16:43:13.516+0800	[34mINFO[0m	s3client/client.go:154	Uploaded:backup/mytest/upload/default_compression_codec.txt
+2024-07-03T16:43:13.516+0800	[34mINFO[0m	s3client/client.go:154	Uploaded:backup/mytest/upload/dim03.mrk2
+2024-07-03T16:43:13.517+0800	[34mINFO[0m	s3client/client.go:154	Uploaded:backup/mytest/upload/count.txt
+2024-07-03T16:43:13.518+0800	[34mINFO[0m	s3client/client.go:154	Uploaded:backup/mytest/upload/__series_id.mrk2
+2024-07-03T16:43:13.518+0800	[34mINFO[0m	s3client/client.go:154	Uploaded:backup/mytest/upload/dim02.mrk2
+2024-07-03T16:43:13.518+0800	[34mINFO[0m	s3client/client.go:154	Uploaded:backup/mytest/upload/dim00.mrk2
+2024-07-03T16:43:13.518+0800	[34mINFO[0m	s3client/client.go:154	Uploaded:backup/mytest/upload/dim01.mrk2
+2024-07-03T16:43:13.987+0800	[34mINFO[0m	s3client/client.go:154	Uploaded:backup/mytest/upload/__series_id.bin
+2024-07-03T16:43:14.723+0800	[34mINFO[0m	s3client/client.go:154	Uploaded:backup/mytest/upload/dim09.mrk2
+2024-07-03T16:43:14.726+0800	[34mINFO[0m	s3client/client.go:154	Uploaded:backup/mytest/upload/dim06.mrk2
+2024-07-03T16:43:14.726+0800	[34mINFO[0m	s3client/client.go:154	Uploaded:backup/mytest/upload/dim04.mrk2
+2024-07-03T16:43:14.727+0800	[34mINFO[0m	s3client/client.go:154	Uploaded:backup/mytest/upload/dim07.mrk2
+2024-07-03T16:43:14.729+0800	[34mINFO[0m	s3client/client.go:154	Uploaded:backup/mytest/upload/dim05.mrk2
+2024-07-03T16:43:14.730+0800	[34mINFO[0m	s3client/client.go:154	Uploaded:backup/mytest/upload/dim08.mrk2
+2024-07-03T16:43:15.319+0800	[34mINFO[0m	s3client/client.go:154	Uploaded:backup/mytest/upload/dim11.mrk2
+2024-07-03T16:43:15.931+0800	[34mINFO[0m	s3client/client.go:154	Uploaded:backup/mytest/upload/dim10.mrk2
+2024-07-03T16:43:16.042+0800	[34mINFO[0m	s3client/client.go:154	Uploaded:backup/mytest/upload/dim12.mrk2
+2024-07-03T16:43:16.701+0800	[34mINFO[0m	s3client/client.go:154	Uploaded:backup/mytest/upload/dim13.mrk2
+2024-07-03T16:43:17.023+0800	[34mINFO[0m	s3client/client.go:154	Uploaded:backup/mytest/upload/dim14.mrk2
+2024-07-03T16:46:03.451+0800	[34mINFO[0m	s3client/client.go:154	Uploaded:backup/mytest/upload/dim05.bin
+2024-07-03T16:46:04.280+0800	[34mINFO[0m	s3client/client.go:154	Uploaded:backup/mytest/upload/dim15.mrk2
+2024-07-03T16:46:57.723+0800	[34mINFO[0m	s3client/client.go:154	Uploaded:backup/mytest/upload/dim09.bin
+2024-07-03T16:46:59.486+0800	[34mINFO[0m	s3client/client.go:154	Uploaded:backup/mytest/upload/dim16.mrk2
+2024-07-03T16:47:41.344+0800	[34mINFO[0m	s3client/client.go:154	Uploaded:backup/mytest/upload/dim13.bin
+2024-07-03T16:47:42.152+0800	[34mINFO[0m	s3client/client.go:154	Uploaded:backup/mytest/upload/dim17.mrk2
+2024-07-03T16:47:45.018+0800	[34mINFO[0m	s3client/client.go:154	Uploaded:backup/mytest/upload/dim11.bin
+2024-07-03T16:47:45.173+0800	[34mINFO[0m	s3client/client.go:154	Uploaded:backup/mytest/upload/dim18.mrk2
+2024-07-03T16:47:53.051+0800	[34mINFO[0m	s3client/client.go:154	Uploaded:backup/mytest/upload/dim12.bin
+2024-07-03T16:47:53.599+0800	[34mINFO[0m	s3client/client.go:154	Uploaded:backup/mytest/upload/dim19.mrk2
+2024-07-03T16:48:28.798+0800	[34mINFO[0m	s3client/client.go:154	Uploaded:backup/mytest/upload/metric00.bin
+2024-07-03T16:48:29.129+0800	[34mINFO[0m	s3client/client.go:154	Uploaded:backup/mytest/upload/metric00.mrk2
+2024-07-03T16:49:03.543+0800	[34mINFO[0m	s3client/client.go:154	Uploaded:backup/mytest/upload/dim10.bin
+2024-07-03T16:49:03.582+0800	[34mINFO[0m	s3client/client.go:154	Uploaded:backup/mytest/upload/metric01.mrk2
+2024-07-03T16:49:03.936+0800	[34mINFO[0m	s3client/client.go:154	Uploaded:backup/mytest/upload/metric01.bin
+2024-07-03T16:49:03.963+0800	[34mINFO[0m	s3client/client.go:154	Uploaded:backup/mytest/upload/metric02.mrk2
+2024-07-03T16:49:04.715+0800	[34mINFO[0m	s3client/client.go:154	Uploaded:backup/mytest/upload/dim04.bin
+2024-07-03T16:49:04.763+0800	[34mINFO[0m	s3client/client.go:154	Uploaded:backup/mytest/upload/metric03.mrk2
+2024-07-03T16:49:04.779+0800	[34mINFO[0m	s3client/client.go:154	Uploaded:backup/mytest/upload/minmax_timestamp.idx
+2024-07-03T16:49:04.787+0800	[34mINFO[0m	s3client/client.go:154	Uploaded:backup/mytest/upload/partition.dat
+2024-07-03T16:49:04.818+0800	[34mINFO[0m	s3client/client.go:154	Uploaded:backup/mytest/upload/primary.idx
+2024-07-03T16:49:05.319+0800	[34mINFO[0m	s3client/client.go:154	Uploaded:backup/mytest/upload/dim08.bin
+2024-07-03T16:49:05.350+0800	[34mINFO[0m	s3client/client.go:154	Uploaded:backup/mytest/upload/dim15.bin
+2024-07-03T16:49:05.384+0800	[34mINFO[0m	s3client/client.go:154	Uploaded:backup/mytest/upload/timestamp.mrk2
+2024-07-03T16:49:06.910+0800	[34mINFO[0m	s3client/client.go:154	Uploaded:backup/mytest/upload/timestamp.bin
+2024-07-03T16:49:07.466+0800	[34mINFO[0m	s3client/client.go:154	Uploaded:backup/mytest/upload/dim07.bin
+2024-07-03T16:49:07.839+0800	[34mINFO[0m	s3client/client.go:154	Uploaded:backup/mytest/upload/metric03.bin
+2024-07-03T16:49:07.866+0800	[34mINFO[0m	s3client/client.go:154	Uploaded:backup/mytest/upload/metric02.bin
+2024-07-03T16:49:14.809+0800	[34mINFO[0m	s3client/client.go:154	Uploaded:backup/mytest/upload/dim16.bin
+2024-07-03T16:49:17.096+0800	[34mINFO[0m	s3client/client.go:154	Uploaded:backup/mytest/upload/dim06.bin
+2024-07-03T16:49:18.408+0800	[34mINFO[0m	s3client/client.go:154	Uploaded:backup/mytest/upload/dim01.bin
+2024-07-03T16:49:18.845+0800	[34mINFO[0m	s3client/client.go:154	Uploaded:backup/mytest/upload/dim14.bin
+2024-07-03T16:49:20.794+0800	[34mINFO[0m	s3client/client.go:154	Uploaded:backup/mytest/upload/dim18.bin
+2024-07-03T16:49:21.056+0800	[34mINFO[0m	s3client/client.go:154	Uploaded:backup/mytest/upload/dim00.bin
+2024-07-03T16:49:22.602+0800	[34mINFO[0m	s3client/client.go:154	Uploaded:backup/mytest/upload/dim02.bin
+2024-07-03T16:49:23.085+0800	[34mINFO[0m	s3client/client.go:154	Uploaded:backup/mytest/upload/dim17.bin
+2024-07-03T16:49:23.920+0800	[34mINFO[0m	s3client/client.go:154	Uploaded:backup/mytest/upload/dim03.bin
+2024-07-03T16:49:25.127+0800	[34mINFO[0m	s3client/client.go:154	Uploaded:backup/mytest/upload/dim19.bin
+2024-07-03T17:05:12.257+0800	[34mINFO[0m	s3client/client.go:156	Uploaded:[/data01/clickhouse/store/3cc/3ccf8474-fa31-469f-8ace-26ece20686d6/19700101_0_0_0/partition.dat] to [19700101/default.test_ck_dataq_r30/192.168.101.93/data/default/test_ck_dataq_r30/19700101_0_0_0/partition.dat]
+2024-07-03T17:05:12.257+0800	[34mINFO[0m	s3client/client.go:156	Uploaded:[/data01/clickhouse/store/3cc/3ccf8474-fa31-469f-8ace-26ece20686d6/19700101_0_0_0/count.txt] to [19700101/default.test_ck_dataq_r30/192.168.101.93/data/default/test_ck_dataq_r30/19700101_0_0_0/count.txt]
+2024-07-03T17:05:12.257+0800	[34mINFO[0m	s3client/client.go:156	Uploaded:[/data01/clickhouse/store/3cc/3ccf8474-fa31-469f-8ace-26ece20686d6/19700101_0_0_0/checksums.txt] to [19700101/default.test_ck_dataq_r30/192.168.101.93/data/default/test_ck_dataq_r30/19700101_0_0_0/checksums.txt]
+2024-07-03T17:05:12.259+0800	[34mINFO[0m	s3client/client.go:156	Uploaded:[/data01/clickhouse/store/3cc/3ccf8474-fa31-469f-8ace-26ece20686d6/19700101_0_0_0/data.mrk3] to [19700101/default.test_ck_dataq_r30/192.168.101.93/data/default/test_ck_dataq_r30/19700101_0_0_0/data.mrk3]
+2024-07-03T17:05:12.259+0800	[34mINFO[0m	s3client/client.go:156	Uploaded:[/data01/clickhouse/store/3cc/3ccf8474-fa31-469f-8ace-26ece20686d6/19700101_0_0_0/default_compression_codec.txt] to [19700101/default.test_ck_dataq_r30/192.168.101.93/data/default/test_ck_dataq_r30/19700101_0_0_0/default_compression_codec.txt]
+2024-07-03T17:05:12.259+0800	[34mINFO[0m	s3client/client.go:156	Uploaded:[/data01/clickhouse/store/3cc/3ccf8474-fa31-469f-8ace-26ece20686d6/19700101_0_0_0/data.bin] to [19700101/default.test_ck_dataq_r30/192.168.101.93/data/default/test_ck_dataq_r30/19700101_0_0_0/data.bin]
+2024-07-03T17:05:12.259+0800	[34mINFO[0m	s3client/client.go:156	Uploaded:[/data01/clickhouse/store/3cc/3ccf8474-fa31-469f-8ace-26ece20686d6/19700101_0_0_0/primary.idx] to [19700101/default.test_ck_dataq_r30/192.168.101.93/data/default/test_ck_dataq_r30/19700101_0_0_0/primary.idx]
+2024-07-03T17:05:12.262+0800	[34mINFO[0m	s3client/client.go:156	Uploaded:[/data01/clickhouse/store/3cc/3ccf8474-fa31-469f-8ace-26ece20686d6/19700101_0_0_0/columns.txt] to [19700101/default.test_ck_dataq_r30/192.168.101.93/data/default/test_ck_dataq_r30/19700101_0_0_0/columns.txt]
+2024-07-03T17:05:12.265+0800	[34mINFO[0m	s3client/client.go:156	Uploaded:[/data01/clickhouse/store/3cc/3ccf8474-fa31-469f-8ace-26ece20686d6/19700101_0_0_0/minmax_timestamp.idx] to [19700101/default.test_ck_dataq_r30/192.168.101.93/data/default/test_ck_dataq_r30/19700101_0_0_0/minmax_timestamp.idx]
+2024-07-03T17:05:12.265+0800	[34mINFO[0m	s3client/client.go:167	%!d(float64=0.073787745) files upload to s3 success! Elapsed: %!d(MISSING) sec
+2024-07-03T17:06:13.734+0800	[34mINFO[0m	s3client/client.go:156	Uploaded:[/data01/clickhouse/store/3cc/3ccf8474-fa31-469f-8ace-26ece20686d6/19700101_0_0_0/data.mrk3] to [19700101/default.test_ck_dataq_r30/192.168.101.93/data/default/test_ck_dataq_r30/19700101_0_0_0/data.mrk3]
+2024-07-03T17:06:13.743+0800	[34mINFO[0m	s3client/client.go:156	Uploaded:[/data01/clickhouse/store/3cc/3ccf8474-fa31-469f-8ace-26ece20686d6/19700101_0_0_0/default_compression_codec.txt] to [19700101/default.test_ck_dataq_r30/192.168.101.93/data/default/test_ck_dataq_r30/19700101_0_0_0/default_compression_codec.txt]
+2024-07-03T17:06:13.744+0800	[34mINFO[0m	s3client/client.go:156	Uploaded:[/data01/clickhouse/store/3cc/3ccf8474-fa31-469f-8ace-26ece20686d6/19700101_0_0_0/columns.txt] to [19700101/default.test_ck_dataq_r30/192.168.101.93/data/default/test_ck_dataq_r30/19700101_0_0_0/columns.txt]
+2024-07-03T17:06:13.745+0800	[34mINFO[0m	s3client/client.go:156	Uploaded:[/data01/clickhouse/store/3cc/3ccf8474-fa31-469f-8ace-26ece20686d6/19700101_0_0_0/partition.dat] to [19700101/default.test_ck_dataq_r30/192.168.101.93/data/default/test_ck_dataq_r30/19700101_0_0_0/partition.dat]
+2024-07-03T17:06:13.746+0800	[34mINFO[0m	s3client/client.go:156	Uploaded:[/data01/clickhouse/store/3cc/3ccf8474-fa31-469f-8ace-26ece20686d6/19700101_0_0_0/checksums.txt] to [19700101/default.test_ck_dataq_r30/192.168.101.93/data/default/test_ck_dataq_r30/19700101_0_0_0/checksums.txt]
+2024-07-03T17:06:13.746+0800	[34mINFO[0m	s3client/client.go:156	Uploaded:[/data01/clickhouse/store/3cc/3ccf8474-fa31-469f-8ace-26ece20686d6/19700101_0_0_0/primary.idx] to [19700101/default.test_ck_dataq_r30/192.168.101.93/data/default/test_ck_dataq_r30/19700101_0_0_0/primary.idx]
+2024-07-03T17:06:13.746+0800	[34mINFO[0m	s3client/client.go:156	Uploaded:[/data01/clickhouse/store/3cc/3ccf8474-fa31-469f-8ace-26ece20686d6/19700101_0_0_0/count.txt] to [19700101/default.test_ck_dataq_r30/192.168.101.93/data/default/test_ck_dataq_r30/19700101_0_0_0/count.txt]
+2024-07-03T17:06:13.748+0800	[34mINFO[0m	s3client/client.go:156	Uploaded:[/data01/clickhouse/store/3cc/3ccf8474-fa31-469f-8ace-26ece20686d6/19700101_0_0_0/minmax_timestamp.idx] to [19700101/default.test_ck_dataq_r30/192.168.101.93/data/default/test_ck_dataq_r30/19700101_0_0_0/minmax_timestamp.idx]
+2024-07-03T17:06:13.748+0800	[34mINFO[0m	s3client/client.go:156	Uploaded:[/data01/clickhouse/store/3cc/3ccf8474-fa31-469f-8ace-26ece20686d6/19700101_0_0_0/data.bin] to [19700101/default.test_ck_dataq_r30/192.168.101.93/data/default/test_ck_dataq_r30/19700101_0_0_0/data.bin]
+2024-07-03T17:06:13.749+0800	[34mINFO[0m	s3client/client.go:167	9 files upload to s3 success! Elapsed: 0.022263849 sec
+2024-07-03T17:06:45.374+0800	[34mINFO[0m	s3client/client.go:156	Uploaded:[/data01/clickhouse/store/3cc/3ccf8474-fa31-469f-8ace-26ece20686d6/19700101_0_0_0/checksums.txt] to [19700101/default.test_ck_dataq_r30/192.168.101.93/data/default/test_ck_dataq_r30/19700101_0_0_0/checksums.txt]
+2024-07-03T17:06:45.374+0800	[34mINFO[0m	s3client/client.go:156	Uploaded:[/data01/clickhouse/store/3cc/3ccf8474-fa31-469f-8ace-26ece20686d6/19700101_0_0_0/minmax_timestamp.idx] to [19700101/default.test_ck_dataq_r30/192.168.101.93/data/default/test_ck_dataq_r30/19700101_0_0_0/minmax_timestamp.idx]
+2024-07-03T17:06:45.376+0800	[34mINFO[0m	s3client/client.go:156	Uploaded:[/data01/clickhouse/store/3cc/3ccf8474-fa31-469f-8ace-26ece20686d6/19700101_0_0_0/columns.txt] to [19700101/default.test_ck_dataq_r30/192.168.101.93/data/default/test_ck_dataq_r30/19700101_0_0_0/columns.txt]
+2024-07-03T17:06:45.376+0800	[34mINFO[0m	s3client/client.go:156	Uploaded:[/data01/clickhouse/store/3cc/3ccf8474-fa31-469f-8ace-26ece20686d6/19700101_0_0_0/data.bin] to [19700101/default.test_ck_dataq_r30/192.168.101.93/data/default/test_ck_dataq_r30/19700101_0_0_0/data.bin]
+2024-07-03T17:06:45.376+0800	[34mINFO[0m	s3client/client.go:156	Uploaded:[/data01/clickhouse/store/3cc/3ccf8474-fa31-469f-8ace-26ece20686d6/19700101_0_0_0/count.txt] to [19700101/default.test_ck_dataq_r30/192.168.101.93/data/default/test_ck_dataq_r30/19700101_0_0_0/count.txt]
+2024-07-03T17:06:45.377+0800	[34mINFO[0m	s3client/client.go:156	Uploaded:[/data01/clickhouse/store/3cc/3ccf8474-fa31-469f-8ace-26ece20686d6/19700101_0_0_0/default_compression_codec.txt] to [19700101/default.test_ck_dataq_r30/192.168.101.93/data/default/test_ck_dataq_r30/19700101_0_0_0/default_compression_codec.txt]
+2024-07-03T17:06:45.377+0800	[34mINFO[0m	s3client/client.go:156	Uploaded:[/data01/clickhouse/store/3cc/3ccf8474-fa31-469f-8ace-26ece20686d6/19700101_0_0_0/data.mrk3] to [19700101/default.test_ck_dataq_r30/192.168.101.93/data/default/test_ck_dataq_r30/19700101_0_0_0/data.mrk3]
+2024-07-03T17:06:45.378+0800	[34mINFO[0m	s3client/client.go:156	Uploaded:[/data01/clickhouse/store/3cc/3ccf8474-fa31-469f-8ace-26ece20686d6/19700101_0_0_0/primary.idx] to [19700101/default.test_ck_dataq_r30/192.168.101.93/data/default/test_ck_dataq_r30/19700101_0_0_0/primary.idx]
+2024-07-03T17:06:45.376+0800	[34mINFO[0m	s3client/client.go:156	Uploaded:[/data01/clickhouse/store/3cc/3ccf8474-fa31-469f-8ace-26ece20686d6/19700101_0_0_0/partition.dat] to [19700101/default.test_ck_dataq_r30/192.168.101.93/data/default/test_ck_dataq_r30/19700101_0_0_0/partition.dat]
+2024-07-03T17:06:45.378+0800	[34mINFO[0m	s3client/client.go:167	9 files upload to s3 success! Elapsed: 0.031137073 sec
+2024-07-03T17:10:22.782+0800	[34mINFO[0m	s3uploader/main.go:45	{
+    "BucketName": "19700101/default.test_ck_dataq_r30/192.168.101.93/data/default/test_ck_dataq_r30/19700101_0_0_0",
+    "FolderPath": "/data01/clickhouse/store/3cc/3ccf8474-fa31-469f-8ace-26ece20686d6/19700101_0_0_0",
+    "AccessKey": "VdmPbwvMlH8ryeqW",
+    "SecretKey": "8z16tUktXpvcjjy5M4MqXvCks5MMHb63",
+    "Region": "zh-west-1",
+    "EndPoint": "http://192.168.101.94:49000/backup",
+    "DryRun": false
+  }
+2024-07-03T17:10:22.793+0800	[34mINFO[0m	s3client/client.go:156	Uploaded:[/data01/clickhouse/store/3cc/3ccf8474-fa31-469f-8ace-26ece20686d6/19700101_0_0_0/default_compression_codec.txt] to [19700101/default.test_ck_dataq_r30/192.168.101.93/data/default/test_ck_dataq_r30/19700101_0_0_0/default_compression_codec.txt]
+2024-07-03T17:10:22.793+0800	[34mINFO[0m	s3client/client.go:156	Uploaded:[/data01/clickhouse/store/3cc/3ccf8474-fa31-469f-8ace-26ece20686d6/19700101_0_0_0/data.mrk3] to [19700101/default.test_ck_dataq_r30/192.168.101.93/data/default/test_ck_dataq_r30/19700101_0_0_0/data.mrk3]
+2024-07-03T17:10:22.793+0800	[34mINFO[0m	s3client/client.go:156	Uploaded:[/data01/clickhouse/store/3cc/3ccf8474-fa31-469f-8ace-26ece20686d6/19700101_0_0_0/minmax_timestamp.idx] to [19700101/default.test_ck_dataq_r30/192.168.101.93/data/default/test_ck_dataq_r30/19700101_0_0_0/minmax_timestamp.idx]
+2024-07-03T17:10:22.794+0800	[34mINFO[0m	s3client/client.go:156	Uploaded:[/data01/clickhouse/store/3cc/3ccf8474-fa31-469f-8ace-26ece20686d6/19700101_0_0_0/data.bin] to [19700101/default.test_ck_dataq_r30/192.168.101.93/data/default/test_ck_dataq_r30/19700101_0_0_0/data.bin]
+2024-07-03T17:10:22.794+0800	[34mINFO[0m	s3client/client.go:156	Uploaded:[/data01/clickhouse/store/3cc/3ccf8474-fa31-469f-8ace-26ece20686d6/19700101_0_0_0/count.txt] to [19700101/default.test_ck_dataq_r30/192.168.101.93/data/default/test_ck_dataq_r30/19700101_0_0_0/count.txt]
+2024-07-03T17:10:22.801+0800	[34mINFO[0m	s3client/client.go:156	Uploaded:[/data01/clickhouse/store/3cc/3ccf8474-fa31-469f-8ace-26ece20686d6/19700101_0_0_0/primary.idx] to [19700101/default.test_ck_dataq_r30/192.168.101.93/data/default/test_ck_dataq_r30/19700101_0_0_0/primary.idx]
+2024-07-03T17:10:22.801+0800	[34mINFO[0m	s3client/client.go:156	Uploaded:[/data01/clickhouse/store/3cc/3ccf8474-fa31-469f-8ace-26ece20686d6/19700101_0_0_0/columns.txt] to [19700101/default.test_ck_dataq_r30/192.168.101.93/data/default/test_ck_dataq_r30/19700101_0_0_0/columns.txt]
+2024-07-03T17:10:22.801+0800	[34mINFO[0m	s3client/client.go:156	Uploaded:[/data01/clickhouse/store/3cc/3ccf8474-fa31-469f-8ace-26ece20686d6/19700101_0_0_0/checksums.txt] to [19700101/default.test_ck_dataq_r30/192.168.101.93/data/default/test_ck_dataq_r30/19700101_0_0_0/checksums.txt]
+2024-07-03T17:10:22.802+0800	[34mINFO[0m	s3client/client.go:156	Uploaded:[/data01/clickhouse/store/3cc/3ccf8474-fa31-469f-8ace-26ece20686d6/19700101_0_0_0/partition.dat] to [19700101/default.test_ck_dataq_r30/192.168.101.93/data/default/test_ck_dataq_r30/19700101_0_0_0/partition.dat]
+2024-07-03T17:10:22.802+0800	[34mINFO[0m	s3client/client.go:167	9 files upload to s3 success! Elapsed: 0.019173482 sec

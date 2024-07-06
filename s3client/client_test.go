@@ -2,18 +2,18 @@ package s3client
 
 import (
 	"fmt"
-	"log"
 	"testing"
 
 	"github.com/YenchangChan/ch2s3/config"
+	"github.com/YenchangChan/ch2s3/log"
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/stretchr/testify/assert"
 )
 
 func TestS3(t *testing.T) {
-	log.SetFlags(log.Lshortfile)
+	log.InitLogger("debug", []string{"stdout"})
 	conf := config.S3{
-		Endpoint: "http://192.168.101.94:49000/bucket",
+		Endpoint: "http://192.168.101.94:49000/backup",
 		//Bucket:         "backup",
 		Region:         "zh-west-1",
 		AccessKey:      "VdmPbwvMlH8ryeqW",

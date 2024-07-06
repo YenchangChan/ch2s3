@@ -10,6 +10,7 @@ pre:
 .PHONY: build
 build: pre
 	go build -ldflags "-X main.BuildStamp=${TIME} -X main.Githash=${REVISION} -X main.Version=${VERSION}"
+	go build -o cmd/s3uploader/s3uploader cmd/s3uploader/main.go 
 
 .PHONY: package
 package: build
@@ -17,6 +18,7 @@ package: build
 	@mkdir -p ./release/ch2s3/bin ./release/ch2s3/conf ./release/ch2s3/reporter ./release/ch2s3/docs
 	@cp README.md ./release/ch2s3/docs
 	@mv ch2s3 ./release/ch2s3/bin
+	@mv cmd/s3uploader/s3uploader ./release/ch2s3/bin
 	@cp resource/backup.json ./release/ch2s3/conf
 	@cd release && tar -czf ../ch2s3-${VERSION}-${TIMESTAMP}-${REVISION}.tar.gz ch2s3
 	@rm -rf ./release

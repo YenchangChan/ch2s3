@@ -31,6 +31,9 @@ type Ch struct {
 	Tables      []string
 	Clean       bool
 	ReadTimeout int
+	SshUser     string
+	SshPassword string
+	SshPort     int
 }
 
 type Config struct {
@@ -63,12 +66,13 @@ func setDefaults(conf *Config) {
 	conf.ClickHouse.Database = "default"
 	conf.ClickHouse.Clean = true
 	conf.ClickHouse.ReadTimeout = 21600 //6h
+	conf.ClickHouse.SshPort = 22
 
 	conf.S3Disk.CleanIfFail = false
 	conf.S3Disk.CompressMethod = "lz4"
 	conf.S3Disk.CompressLevel = 3
 	conf.S3Disk.IgnoreExists = true
-	conf.S3Disk.RetryTimes = 0 //不重试
+	conf.S3Disk.RetryTimes = 1 //不重试
 	conf.S3Disk.UsePathStyle = true
 
 	conf.LogLevel = "info"

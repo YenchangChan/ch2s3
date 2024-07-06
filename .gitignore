@@ -4,3 +4,4 @@ conf
 release
 ch2s3
 ch2s3*.tar.gz
+cmd/s3uploader/s3uploader

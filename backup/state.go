@@ -13,6 +13,7 @@ type State struct {
 	rows       uint64
 	buncsize   uint64
 	bcsize     uint64
+	rsize      uint64
 	extval     int
 	why        error
 }
@@ -35,6 +36,8 @@ func (s *State) Set(key string, value any) {
 		s.buncsize = value.(uint64)
 	case constant.STATE_COMPRESSED_SIZE:
 		s.bcsize = value.(uint64)
+	case constant.STATE_REMOTE_SIZE:
+		s.rsize = value.(uint64)
 	}
 }
 

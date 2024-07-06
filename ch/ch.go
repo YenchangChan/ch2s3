@@ -4,7 +4,9 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"strings"
 	"sync"
+	"sync/atomic"
 	"time"
 
 	"github.com/ClickHouse/clickhouse-go/v2"
@@ -12,12 +14,14 @@ import (
 	"github.com/YenchangChan/ch2s3/config"
 	"github.com/YenchangChan/ch2s3/log"
 	"github.com/YenchangChan/ch2s3/s3client"
+	"github.com/YenchangChan/ch2s3/utils"
 	"github.com/avast/retry-go/v4"
 )
 
 type Conn struct {
-	h string
-	c driver.Conn
+	h    string
+	c    driver.Conn
+	opts utils.SshOptions
 }
 
 var (
@@ -54,6 +58,12 @@ func Connect(conf config.Ch) error {
 			shardConns = append(shardConns, Conn{
 				h: replica,
 				c: c,
+				opts: utils.SshOptions{
+					Host:     replica,
+					Port:     conf.SshPort,
+					User:     conf.SshUser,
+					Password: conf.SshPassword,
+				},
 			})
 		}
 		if len(shardConns) > 0 {
@@ -230,7 +240,7 @@ func genBackupSql(database, table, partition, host string, conf config.S3) (stri
 		partition, database, table, host)
 	sql += fmt.Sprintf(" TO S3('%s/%s', '%s', '%s')",
 		conf.Endpoint, key, conf.AccessKey, conf.SecretKey)
-	sql += fmt.Sprintf(" SETTINGS compression_method='%s', compression_level=%d", conf.CompressMethod, conf.CompressLevel)
+	sql += fmt.Sprintf(" SETTINGS structure_only = 1,compression_method='%s', compression_level=%d", conf.CompressMethod, conf.CompressLevel)
 	return key, sql
 }
 
@@ -250,14 +260,78 @@ func genResoreSql(database, table, partition, host string, conf config.S3) strin
 	return sql
 }
 
-func Ch2S3(database, table, partition string, conf config.S3) error {
+func Paths(database, table, partition string) (map[string]utils.PathInfo, error) {
+	paths := make(map[string]utils.PathInfo)
+
+	query := fmt.Sprintf(`SELECT path FROM system.parts WHERE (database = '%s') AND (table = '%s') AND (partition = '%s')`,
+		database, table, partition)
+	for i := range conns {
+		conn, err := GetAvaliableConn(i)
+		if err != nil {
+			return nil, err
+		}
+		log.Logger.Debugf("[%s]%s", conn.h, query)
+		rows, err := conn.c.Query(context.Background(), query)
+		if err != nil {
+			return nil, err
+		}
+		defer rows.Close()
+		var allPaths []string
+		for rows.Next() {
+			var path string
+			if err := rows.Scan(&path); err != nil {
+				return nil, err
+			}
+			if strings.HasSuffix(path, "/") {
+				path += "*"
+			}
+			log.Logger.Debugf("path: %s", path)
+			allPaths = append(allPaths, path)
+		}
+		for _, p := range allPaths {
+			log.Logger.Debugf("shell: md5sum %s", p)
+			out, err := utils.RemoteExecute(conn.opts, fmt.Sprintf("md5sum %s", p))
+			if err != nil {
+				log.Logger.Errorf("md5sum %s failed: %v", p, err)
+				return nil, err
+			}
+			log.Logger.Debugf("out: %s", out)
+			for _, line := range strings.Split(out, "\n") {
+				if line == "" {
+					continue
+				}
+				fields := strings.Fields(line)
+				if len(fields) != 2 {
+					return nil, fmt.Errorf("md5sum output format error: %s", line)
+				}
+				md5sum := fields[0]
+				pp := strings.Split(fields[1], "/")
+				partfiles := strings.Join(pp[len(pp)-2:], "/")
+				key := fmt.Sprintf("%s/%s.%s/%s/data/%s/%s/%s",
+					partition, database, table, conn.h, database, table, partfiles)
+				paths[key] = utils.PathInfo{
+					Host:  conn.h,
+					RPath: key,
+					LPath: fields[1],
+					MD5:   md5sum,
+				}
+				log.Logger.Debugf("clickhouse local path:[%s] path: %s, key: %s, checksum: %s", conn.h, fields[1], key, md5sum)
+			}
+		}
+	}
+
+	return paths, nil
+}
+
+func Ch2S3(database, table, partition string, conf config.S3) (uint64, error) {
 	var wg sync.WaitGroup
 	var lastErr error
+	var rsize uint64
 	wg.Add(len(conns))
 	for i := range conns {
 		conn, err := GetAvaliableConn(i)
 		if err != nil {
-			return err
+			return rsize, err
 		}
 		go func(conn Conn) {
 			defer wg.Done()
@@ -265,32 +339,42 @@ func Ch2S3(database, table, partition string, conf config.S3) error {
 			log.Logger.Infof("backup sql => [%s]%s", conn.h, query)
 			if err := retry.Do(
 				func() error {
-					tryClean := false
-				CLEANED:
-					err := conn.c.Exec(context.Background(), query)
+					//step0: 获取表数据
+					log.Logger.Infof("[%s]step0 -> init", conn.h)
+					paths, err := Paths(database, table, partition)
+					if err != nil {
+						return err
+					}
+					//step1: 备份表schema
+					log.Logger.Infof("[%s]step1 -> backup schema", conn.h)
+				AGAIN:
+					err = conn.c.Exec(context.Background(), query)
 					if err != nil {
 						var exception *clickhouse.Exception
 						if errors.As(err, &exception) {
 							if exception.Code == 598 {
-								if tryClean {
-									if conf.IgnoreExists {
-										log.Logger.Warnf("[%s] %v, ignore it", conn.h, exception.Message)
-										return nil
-									} else {
-										return err
-									}
-								}
-								log.Logger.Warnf("[%s] %v, try to clean from remote s3, and retry.", conn.h, exception.Message)
 								err = s3client.Remove(conf.Bucket, key)
 								if err != nil {
 									log.Logger.Errorf("[%s] clean data %s from s3 failed:%v", conn.h, key, err)
 								}
-								tryClean = true
-								goto CLEANED
+								goto AGAIN
 							}
 						}
 						return err
 					}
+					//step2: 备份数据
+					log.Logger.Infof("[%s]step2 -> upload data", conn.h)
+					if err := Upload(conn.opts, paths, conf); err != nil {
+						return err
+					}
+					//step3: 校验数据
+					log.Logger.Infof("[%s]step3 -> check sum", conn.h)
+					s3size, err := s3client.CheckSum(conn.h, conf.Bucket, key, paths)
+					if err != nil {
+						log.Logger.Errorf("[%s] check sum %s from s3 failed:%v", conn.h, key, err)
+						return err
+					}
+					atomic.AddUint64(&rsize, s3size)
 					log.Logger.Infof("[%s]%s %s backup success", conn.h, key, partition)
 					return nil
 				},
@@ -312,7 +396,7 @@ func Ch2S3(database, table, partition string, conf config.S3) error {
 		}(conn)
 	}
 	wg.Wait()
-	return lastErr
+	return rsize, lastErr
 }
 
 func Restore(database, table, partition string, conf config.S3) error {

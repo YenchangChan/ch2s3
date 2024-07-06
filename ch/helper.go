@@ -1,0 +1,61 @@
+package ch
+
+import (
+	"fmt"
+	"path"
+
+	"github.com/YenchangChan/ch2s3/config"
+	"github.com/YenchangChan/ch2s3/log"
+	"github.com/YenchangChan/ch2s3/utils"
+)
+
+func Upload(opts utils.SshOptions, paths map[string]utils.PathInfo, conf config.S3) error {
+	//上传s3uploader 到对端机器
+	if err := utils.ScpUploadFile("bin/s3uploader", "/opt/s3uploader", opts); err != nil {
+		return err
+	}
+	if _, err := utils.RemoteExecute(opts, "chmod u+x /opt/s3uploader"); err != nil {
+		return err
+	}
+	//执行s3uploader 命令
+	/*
+		./s3uploader
+			-b 19700101/default.test_ck_dataq_r30/192.168.101.93/data/default/test_ck_dataq_r30/19700101_0_0_0
+			-f /data01/clickhouse/store/3cc/3ccf8474-fa31-469f-8ace-26ece20686d6/19700101_0_0_0
+			-a VdmPbwvMlH8ryeqW
+			-s 8z16tUktXpvcjjy5M4MqXvCks5MMHb63
+			-r zh-west-1
+			-e http://192.168.101.94:49000/backup
+	*/
+	pathInfo := make(map[string]utils.PathInfo)
+	for k, v := range paths {
+		newKey := path.Dir(k)
+		if _, ok := pathInfo[newKey]; !ok {
+			if v.Host == opts.Host {
+				newValue := utils.PathInfo{
+					Host:  v.Host,
+					MD5:   v.MD5,
+					RPath: newKey,
+					LPath: path.Dir(v.LPath),
+				}
+				pathInfo[newKey] = newValue
+			}
+		}
+	}
+
+	for _, v := range pathInfo {
+		log.Logger.Debugf("[%s]lpath: %s, rpath: %v", opts.Host, v.LPath, v.RPath)
+		cmd := fmt.Sprintf("/opt/s3uploader -b %s -f %s -a %s -s %s -r %s -e %s",
+			v.RPath, v.LPath, conf.AccessKey, conf.SecretKey, conf.Region, conf.Endpoint)
+		log.Logger.Infof("[%s]cmd: %s", opts.Host, cmd)
+		if _, err := utils.RemoteExecute(opts, cmd); err != nil {
+			return err
+		}
+
+	}
+	//删除s3uploader工具
+	if _, err := utils.RemoteExecute(opts, "rm -f /opt/s3uploader"); err != nil {
+		return err
+	}
+	return nil
+}
