@@ -30,31 +30,37 @@ ch2s3会通过报表的形式输出每次备份的结果，包含一共备份了
 
 - clickhouse
 
-| 配置项| 默认值| 说明|
-|------|------|-----|
-|cluster||集群名|
-|hosts||二层数组，外层为shard，内层为replica|
-|port|9000|clickhouse端口|
-|user|default|clickhouse连接用户|
-|password||clickhouse连接密码|
-|clean|true|备份成功后是否删除掉本地数据|
-|database|default|需要备份的数据库|
-|tables||需要备份的表，数组形式，可以是多个表|
-|readTimeout|21600|client 连接超时时间， 默认6h|
+| 配置项| 默认值|是否必填|说明|
+|------|------|-------|---|
+|cluster||Y|集群名|
+|hosts||Y|二层数组，外层为shard，内层为replica|
+|port|9000|Y|clickhouse端口|
+|user|default|Y|clickhouse连接用户|
+|password||Y|clickhouse连接密码|
+|sshUser||Y|ssh连接用户|
+|sshPassword||Y|ssh连接密码|
+|sshPort|22|Y|ssh连接端口|
+|clean|true|N|备份成功后是否删除掉本地数据|
+|database|default|Y|需要备份的数据库|
+|tables||Y|需要备份的表，数组形式，可以是多个表|
+|readTimeout|21600|N|client 连接超时时间， 默认6h|
 - s3
 
-| 配置项| 默认值| 说明|
-|------|------|-----|
-|endpoint||S3端点地址，需要带bucket名|
-|region||S3区域,当备份失败要删除远端s3不完整数据时，该配置必填|
-|cleanIfFail|false|备份失败是否删除S3数据|
-|accessKey||访问秘钥|
-|secretKey||秘钥|
-|compress_method|lz4|压缩算法，支持lz4, lz4hc, zstd,deflate_qpl|
-|compress_level|3|压缩等级|
-|ignore_exists|true|如果S3上已有备份数据，是否报错，默认不报错， 仅当备份时该参数有效|
-|retry_times|0|备份失败重试次数，默认不重试|
-|use_path_style|true|S3 SDK 默认使用 virtual-hosted style 方式。但某些对象存储系统可能没开启或没支持virtual-hosted style 方式的访问，此时我们可以添加 use_path_style 参数来强制使用 path style 方式。比如 minio默认情况下只允许path style访问方式，所以在访问minio时要设置为true|
+| 配置项| 默认值|是否必填| 说明|
+|------|------|-------|----|
+|endpoint||Y|S3端点地址，需要带bucket名|
+|region||Y|S3区域|
+|cleanIfFail|false|N|备份失败是否删除S3数据|
+|accessKey||Y|访问秘钥|
+|secretKey||Y|秘钥|
+|compress_method|lz4|N|压缩算法，支持lz4, lz4hc, zstd,deflate_qpl|
+|compress_level|3|N|压缩等级|
+|retry_times|0|N|备份失败重试次数，默认不重试|
+|cleanIfFail|false|N|备份失败是否删除S3数据|
+|checksum|true|N|是否开启校验和|
+|use_path_style|true|N|S3 SDK 默认使用 virtual-hosted style 方式。但某些对象存储系统可能没开启或没支持virtual-hosted style 方式的访问，此时我们可以添加 use_path_style 参数来强制使用 path style 方式。比如 minio默认情况下只允许path style访问方式，所以在访问minio时要设置为true|
+
+
 ## 配置示例
 ```json
 {
@@ -65,8 +71,11 @@ ch2s3会通过报表的形式输出每次备份的结果，包含一共备份了
             ["192.168.101.96", "192.168.101.97"]
         ],
         "port": 19000,
-        "user":"default",
+        "username":"default",
         "password":"123456",
+        "sshUser": "root",
+        "sshPassword": "123456",
+        "sshPort": 22,
 		"clean": false,
         "database":"default",
         "tables":[
@@ -80,8 +89,12 @@ ch2s3会通过报表的形式输出每次备份的结果，包含一共备份了
         "endpoint":"http://192.168.101.94:49000/backup",
         "accessKey":"VdmPbwvMlH8ryeqW",
         "secretKey":"8z16tUktXpvcjjy5M4MqXvCks5MMHb63",
-        "compress_method":"zstd"
-    }
+        "region":"",
+        "compression":"zstd",
+        "checksum": false,
+        "cleanIfFail": true
+    },
+    "loglevel": "debug"
 }
 ```
 # 如何使用
@@ -92,10 +105,10 @@ ch2s3会通过报表的形式输出每次备份的结果，包含一共备份了
 ```
 - 指定TTL
 ```bash
-./ch2s3 -ttl "5 DAY"  #备份5天前的数据（当天）
-./ch2s3 -ttl "2 WEEK" #备份2周前的数据（当天）
-./ch2s3 -ttl "3 MONTH" #备份3个月前的数据（当天）
-./ch2s3 -ttl "1 YEAR" #备份1年前的数据（当天） 
+./ch2s3 -ttl "5 DAY"  #备份5天前的数据
+./ch2s3 -ttl "2 WEEK" #备份2周前的数据
+./ch2s3 -ttl "3 MONTH" #备份3个月前的数据
+./ch2s3 -ttl "1 YEAR" #备份1年前的数据 
 ```
 ## 恢复
 - 恢复一个分区
@@ -125,7 +138,7 @@ Total Tables: 4,  Success Tables: 4,  Failed Tables: 0,  Total Bytes: 168.53 GiB
 
 ```
 # 性能
-经测试，备份160G数据，共计耗时120秒，平均1.33G/s， 存储到S3上数据大小为90G左右，有二次压缩。
+开启checksum校验和的情况下，备份速度约300M/s，关闭checksum校验和，约660M/s。以上数据仅供参考，具体备份速度与硬件配置，网络质量均有关。
 
 # 最佳实践
 ## 定时任务

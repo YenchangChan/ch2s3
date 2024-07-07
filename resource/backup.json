@@ -8,6 +8,9 @@
         "port": 19000,
         "username":"default",
         "password":"123456",
+        "sshUser": "root",
+        "sshPassword": "123456",
+        "sshPort": 22,
 		"clean": false,
         "database":"default",
         "tables":[
@@ -22,7 +25,9 @@
         "accessKey":"VdmPbwvMlH8ryeqW",
         "secretKey":"8z16tUktXpvcjjy5M4MqXvCks5MMHb63",
         "region":"",
-        "compression":"zstd"
+        "compression":"zstd",
+        "checksum": false,
+        "cleanIfFail": true
     },
     "loglevel": "debug"
 }

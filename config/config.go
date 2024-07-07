@@ -9,7 +9,7 @@ import (
 
 type S3 struct {
 	Endpoint       string
-	Bucket         string
+	Bucket         string `json:"-"`
 	Region         string
 	AccessKey      string
 	SecretKey      string
