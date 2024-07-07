@@ -71,7 +71,6 @@ func (this *Backup) Do() error {
 			rsize, err := ch.Ch2S3(this.conf.ClickHouse.Database, table, p, this.conf.S3Disk)
 			this.states[statekey].Set(constant.STATE_REMOTE_SIZE, rsize)
 			if err != nil {
-				// 失败即中止整张表的备份
 				log.Logger.Errorf("table %s partition %s backup failed: %v", statekey, p, err)
 				this.states[statekey].Failure(err)
 				ok = false
