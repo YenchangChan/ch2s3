@@ -15,10 +15,10 @@ type S3 struct {
 	SecretKey      string
 	CompressMethod string `json:"compress_method"` //lz4, lz4hc, zstd,deflate_qpl
 	CompressLevel  int    `json:"compress_level"`
-	IgnoreExists   bool   `json:"ignore_exists"` //如果S3上已存在不报错
 	RetryTimes     uint   `json:"retry_times"`
 	CleanIfFail    bool
 	UsePathStyle   bool `json:"use_path_style"`
+	CheckSum       bool
 }
 
 type Ch struct {
@@ -71,9 +71,9 @@ func setDefaults(conf *Config) {
 	conf.S3Disk.CleanIfFail = false
 	conf.S3Disk.CompressMethod = "lz4"
 	conf.S3Disk.CompressLevel = 3
-	conf.S3Disk.IgnoreExists = true
 	conf.S3Disk.RetryTimes = 1 //不重试
 	conf.S3Disk.UsePathStyle = true
+	conf.S3Disk.CheckSum = true
 
 	conf.LogLevel = "info"
 }

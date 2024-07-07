@@ -20,7 +20,6 @@ func TestS3(t *testing.T) {
 		SecretKey:      "8z16tUktXpvcjjy5M4MqXvCks5MMHb63",
 		CompressMethod: "gzip",
 		CompressLevel:  1,
-		IgnoreExists:   true,
 		RetryTimes:     3,
 		CleanIfFail:    true,
 	}

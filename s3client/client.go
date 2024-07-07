@@ -83,7 +83,7 @@ func Remove(bucket, key string) error {
 	return nil
 }
 
-func CheckSum(host string, bucket, key string, paths map[string]utils.PathInfo) (uint64, error) {
+func CheckSum(host string, bucket, key string, paths map[string]utils.PathInfo, conf config.S3) (uint64, error) {
 	var rsize uint64
 	params := &s3.ListObjectsInput{
 		Bucket: aws.String(bucket),
@@ -108,8 +108,10 @@ func CheckSum(host string, bucket, key string, paths map[string]utils.PathInfo) 
 			continue
 		}
 		if _, ok := rpaths[k]; ok {
-			if v.MD5 != rpaths[k] {
-				return rsize, fmt.Errorf("checksum mismatch for %s, expect %s, but got %s", k, v, rpaths[k])
+			if conf.CheckSum {
+				if v.MD5 != rpaths[k] {
+					return rsize, fmt.Errorf("checksum mismatch for %s, expect %s, but got %s", k, v, rpaths[k])
+				}
 			}
 		} else {
 			return rsize, fmt.Errorf("file %s not found on s3", k)

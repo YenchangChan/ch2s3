@@ -260,7 +260,7 @@ func genResoreSql(database, table, partition, host string, conf config.S3) strin
 	return sql
 }
 
-func Paths(database, table, partition string) (map[string]utils.PathInfo, error) {
+func Paths(database, table, partition string, conf config.S3) (map[string]utils.PathInfo, error) {
 	paths := make(map[string]utils.PathInfo)
 
 	query := fmt.Sprintf(`SELECT path FROM system.parts WHERE (database = '%s') AND (table = '%s') AND (partition = '%s')`,
@@ -288,34 +288,62 @@ func Paths(database, table, partition string) (map[string]utils.PathInfo, error)
 			log.Logger.Debugf("path: %s", path)
 			allPaths = append(allPaths, path)
 		}
-		for _, p := range allPaths {
-			log.Logger.Debugf("shell: md5sum %s", p)
-			out, err := utils.RemoteExecute(conn.opts, fmt.Sprintf("md5sum %s", p))
-			if err != nil {
-				log.Logger.Errorf("md5sum %s failed: %v", p, err)
-				return nil, err
+		if conf.CheckSum {
+			for _, p := range allPaths {
+				log.Logger.Debugf("shell: md5sum %s", p)
+				out, err := utils.RemoteExecute(conn.opts, fmt.Sprintf("md5sum %s", p))
+				if err != nil {
+					log.Logger.Errorf("md5sum %s failed: %v", p, err)
+					return nil, err
+				}
+				log.Logger.Debugf("out: %s", out)
+				for _, line := range strings.Split(out, "\n") {
+					if line == "" {
+						continue
+					}
+					fields := strings.Fields(line)
+					if len(fields) != 2 {
+						return nil, fmt.Errorf("md5sum output format error: %s", line)
+					}
+					md5sum := fields[0]
+					pp := strings.Split(fields[1], "/")
+					partfiles := strings.Join(pp[len(pp)-2:], "/")
+					key := fmt.Sprintf("%s/%s.%s/%s/data/%s/%s/%s",
+						partition, database, table, conn.h, database, table, partfiles)
+					paths[key] = utils.PathInfo{
+						Host:  conn.h,
+						RPath: key,
+						LPath: fields[1],
+						MD5:   md5sum,
+					}
+					log.Logger.Debugf("clickhouse local path:[%s] path: %s, key: %s, checksum: %s", conn.h, fields[1], key, md5sum)
+				}
 			}
-			log.Logger.Debugf("out: %s", out)
-			for _, line := range strings.Split(out, "\n") {
-				if line == "" {
-					continue
+		} else {
+			for _, p := range allPaths {
+				log.Logger.Debugf("shell: ls %s", p)
+				out, err := utils.RemoteExecute(conn.opts, fmt.Sprintf("ls %s", p))
+				if err != nil {
+					log.Logger.Errorf("ls %s failed: %v", p, err)
+					return nil, err
 				}
-				fields := strings.Fields(line)
-				if len(fields) != 2 {
-					return nil, fmt.Errorf("md5sum output format error: %s", line)
+				log.Logger.Debugf("out: %s", out)
+				for _, line := range strings.Split(out, "\n") {
+					if line == "" {
+						continue
+					}
+					line = strings.TrimSuffix(line, "\r")
+					pp := strings.Split(line, "/")
+					partfiles := strings.Join(pp[len(pp)-2:], "/")
+					key := fmt.Sprintf("%s/%s.%s/%s/data/%s/%s/%s",
+						partition, database, table, conn.h, database, table, partfiles)
+					paths[key] = utils.PathInfo{
+						Host:  conn.h,
+						RPath: key,
+						LPath: line,
+					}
+					log.Logger.Debugf("clickhouse local path:[%s] path: %s, key: %s", conn.h, line, key)
 				}
-				md5sum := fields[0]
-				pp := strings.Split(fields[1], "/")
-				partfiles := strings.Join(pp[len(pp)-2:], "/")
-				key := fmt.Sprintf("%s/%s.%s/%s/data/%s/%s/%s",
-					partition, database, table, conn.h, database, table, partfiles)
-				paths[key] = utils.PathInfo{
-					Host:  conn.h,
-					RPath: key,
-					LPath: fields[1],
-					MD5:   md5sum,
-				}
-				log.Logger.Debugf("clickhouse local path:[%s] path: %s, key: %s, checksum: %s", conn.h, fields[1], key, md5sum)
 			}
 		}
 	}
@@ -341,7 +369,7 @@ func Ch2S3(database, table, partition string, conf config.S3) (uint64, error) {
 				func() error {
 					//step0: 获取表数据
 					log.Logger.Infof("[%s]step0 -> init", conn.h)
-					paths, err := Paths(database, table, partition)
+					paths, err := Paths(database, table, partition, conf)
 					if err != nil {
 						return err
 					}
@@ -369,7 +397,7 @@ func Ch2S3(database, table, partition string, conf config.S3) (uint64, error) {
 					}
 					//step3: 校验数据
 					log.Logger.Infof("[%s]step3 -> check sum", conn.h)
-					s3size, err := s3client.CheckSum(conn.h, conf.Bucket, key, paths)
+					s3size, err := s3client.CheckSum(conn.h, conf.Bucket, key, paths, conf)
 					if err != nil {
 						log.Logger.Errorf("[%s] check sum %s from s3 failed:%v", conn.h, key, err)
 						return err
