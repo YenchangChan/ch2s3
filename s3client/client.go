@@ -88,7 +88,6 @@ func CheckSum(host string, bucket, key string, paths map[string]utils.PathInfo, 
 	params := &s3.ListObjectsInput{
 		Bucket: aws.String(bucket),
 	}
-	log.Logger.Infof("bucket: %s, key: %s, len(paths): %d", bucket, key, len(paths))
 	resp, err := svc.ListObjects(params)
 	if err != nil {
 		return rsize, err
@@ -100,7 +99,7 @@ func CheckSum(host string, bucket, key string, paths map[string]utils.PathInfo, 
 			size := *item.Size
 			rsize += uint64(size)
 			rpaths[*item.Key] = checksum
-			log.Logger.Infof("remote s3 path: %s, checksum: %s", *item.Key, checksum)
+			log.Logger.Debugf("remote s3 path: %s, checksum: %s", *item.Key, checksum)
 		}
 	}
 	for k, v := range paths {

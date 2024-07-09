@@ -9,9 +9,9 @@ import (
 	"github.com/YenchangChan/ch2s3/utils"
 )
 
-func Upload(opts utils.SshOptions, paths map[string]utils.PathInfo, conf config.S3) error {
+func Upload(opts utils.SshOptions, paths map[string]utils.PathInfo, conf config.S3, cwd string) error {
 	//上传s3uploader 到对端机器
-	if err := utils.ScpUploadFile("bin/s3uploader", "/opt/s3uploader", opts); err != nil {
+	if err := utils.ScpUploadFile(path.Join(cwd, "bin", "s3uploader"), "/opt/s3uploader", opts); err != nil {
 		return err
 	}
 	if _, err := utils.RemoteExecute(opts, "chmod u+x /opt/s3uploader"); err != nil {

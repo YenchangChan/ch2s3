@@ -20,6 +20,7 @@ type Backup struct {
 	cponly    bool
 	states    map[string]*State
 	reporter  string
+	cwd       string
 }
 
 func NewBack(conf *config.Config, op_type, partition, cwd string, cponly bool) *Backup {
@@ -29,6 +30,7 @@ func NewBack(conf *config.Config, op_type, partition, cwd string, cponly bool) *
 		partition: partition,
 		cponly:    cponly,
 		states:    make(map[string]*State),
+		cwd:       cwd,
 		reporter:  fmt.Sprintf(path.Join(cwd, "reporter/%s_%s.out"), op_type, time.Now().Format("20060102T15:04:05")),
 	}
 }
@@ -68,7 +70,7 @@ func (this *Backup) Do() error {
 		ok := true
 		for i, p := range partitions {
 			log.Logger.Infof("(%d/%d) table %s [%s] backup ", i+1, len(partitions), statekey, p)
-			rsize, err := ch.Ch2S3(this.conf.ClickHouse.Database, table, p, this.conf.S3Disk)
+			rsize, err := ch.Ch2S3(this.conf.ClickHouse.Database, table, p, this.conf.S3Disk, this.cwd)
 			this.states[statekey].Set(constant.STATE_REMOTE_SIZE, rsize)
 			if err != nil {
 				log.Logger.Errorf("table %s partition %s backup failed: %v", statekey, p, err)

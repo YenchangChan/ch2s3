@@ -240,7 +240,7 @@ func genBackupSql(database, table, partition, host string, conf config.S3) (stri
 		partition, database, table, host)
 	sql += fmt.Sprintf(" TO S3('%s/%s', '%s', '%s')",
 		conf.Endpoint, key, conf.AccessKey, conf.SecretKey)
-	sql += fmt.Sprintf(" SETTINGS structure_only = 1,compression_method='%s', compression_level=%d", conf.CompressMethod, conf.CompressLevel)
+	sql += fmt.Sprintf(" SETTINGS compression_method='%s', compression_level=%d", conf.CompressMethod, conf.CompressLevel)
 	return key, sql
 }
 
@@ -351,7 +351,7 @@ func Paths(database, table, partition string, conf config.S3) (map[string]utils.
 	return paths, nil
 }
 
-func Ch2S3(database, table, partition string, conf config.S3) (uint64, error) {
+func Ch2S3(database, table, partition string, conf config.S3, cwd string) (uint64, error) {
 	var wg sync.WaitGroup
 	var lastErr error
 	var rsize uint64
@@ -373,36 +373,52 @@ func Ch2S3(database, table, partition string, conf config.S3) (uint64, error) {
 					if err != nil {
 						return err
 					}
-					//step1: 备份表schema
-					log.Logger.Infof("[%s]step1 -> backup schema", conn.h)
+					//step1: 备份表
+					again := false
+					log.Logger.Infof("[%s]step1 -> backup", conn.h)
 				AGAIN:
 					err = conn.c.Exec(context.Background(), query)
 					if err != nil {
 						var exception *clickhouse.Exception
 						if errors.As(err, &exception) {
-							if exception.Code == 598 {
-								err = s3client.Remove(conf.Bucket, key)
-								if err != nil {
-									log.Logger.Errorf("[%s] clean data %s from s3 failed:%v", conn.h, key, err)
+							if exception.Code == 598 && conf.CleanIfFail {
+								if !again {
+									err = s3client.Remove(conf.Bucket, key)
+									if err != nil {
+										log.Logger.Errorf("[%s] clean data %s from s3 failed:%v", conn.h, key, err)
+									}
+									again = true
+									goto AGAIN
 								}
-								goto AGAIN
 							}
 						}
 						return err
 					}
-					//step2: 备份数据
-					log.Logger.Infof("[%s]step2 -> upload data", conn.h)
-					if err := Upload(conn.opts, paths, conf); err != nil {
-						return err
-					}
-					//step3: 校验数据
+
+					//step2: 校验数据
 					log.Logger.Infof("[%s]step3 -> check sum", conn.h)
 					s3size, err := s3client.CheckSum(conn.h, conf.Bucket, key, paths, conf)
+					log.Logger.Debugf("1111 s3size: %v", s3size)
 					if err != nil {
-						log.Logger.Errorf("[%s] check sum %s from s3 failed:%v", conn.h, key, err)
-						return err
+						log.Logger.Warnf("[%s] check sum %s from s3 failed:%v, try to upload local file", conn.h, key, err)
+						//step3: 校验失败，尝试手动备份数据
+						log.Logger.Infof("[%s]step4 -> upload data", conn.h)
+						if err := Upload(conn.opts, paths, conf, cwd); err != nil {
+							return err
+						}
+						s3size, err = s3client.CheckSum(conn.h, conf.Bucket, key, paths, conf)
+						if err != nil {
+							log.Logger.Errorf("[%s] check sum %s from s3 failed:%v", conn.h, key, err)
+							return err
+						}
+						log.Logger.Debugf("2222 s3size: %v", s3size)
+						atomic.AddUint64(&rsize, s3size)
+					} else {
+						log.Logger.Debugf("3333 s3size: %v", s3size)
+						atomic.AddUint64(&rsize, s3size)
 					}
-					atomic.AddUint64(&rsize, s3size)
+					log.Logger.Debugf("4444 s3size: %v", s3size)
+
 					log.Logger.Infof("[%s]%s %s backup success", conn.h, key, partition)
 					return nil
 				},
