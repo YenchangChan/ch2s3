@@ -277,7 +277,7 @@ func RemoteExecute(opts SshOptions, cmd string) (string, error) {
 
 func genFinalScript(user, cmd string) string {
 	var shell string
-	if user != "root" {
+	if user != "root" && user != "clickhouse" {
 		cmds := strings.Split(cmd, ";")
 		for index, command := range cmds {
 			cmds[index] = fmt.Sprintf("sudo %s", command)
@@ -285,7 +285,7 @@ func genFinalScript(user, cmd string) string {
 		cmd = strings.Join(cmds, ";")
 		shell = fmt.Sprintf("export LANG=en_US.UTF-8; %s", cmd)
 	} else {
-		shell = cmd
+		shell = fmt.Sprintf("export LANG=en_US.UTF-8; %s", cmd)
 	}
 	shell = fmt.Sprintf("echo 'i love china'; %s", shell)
 	return shell
