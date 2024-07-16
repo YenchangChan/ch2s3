@@ -6,7 +6,6 @@ import (
 	"fmt"
 	"strings"
 	"sync"
-	"sync/atomic"
 	"time"
 
 	"github.com/ClickHouse/clickhouse-go/v2"
@@ -110,11 +109,21 @@ func Size(database, table, partition string, cponly bool) (uint64, uint64, error
 	var lock sync.Mutex
 	var uncompressed_size, compressed_size uint64
 	wg.Add(len(conns))
+	var partitions []string
 	op := "<="
 	if cponly {
-		op = "="
+		partitions = strings.Split(partition, ",")
+		if len(partitions) == 1 {
+			op = "="
+			partition = "'" + partition + "'"
+		} else {
+			op = "in"
+			partition = "('" + strings.Join(partitions, "','") + "')"
+		}
+	} else {
+		partition = "'" + partition + "'"
 	}
-	query := fmt.Sprintf("SELECT sum(data_uncompressed_bytes), sum(data_compressed_bytes) FROM system.parts WHERE partition %s '%s' AND database = '%s' AND table = '%s'",
+	query := fmt.Sprintf("SELECT sum(data_uncompressed_bytes), sum(data_compressed_bytes) FROM system.parts WHERE partition %s %s AND database = '%s' AND table = '%s'",
 		op, partition, database, table)
 	log.Logger.Debugf("execute sql => %s", query)
 	for i := range conns {
@@ -147,11 +156,21 @@ func Rows(database, table, partition string, cponly bool) (uint64, error) {
 	var lock sync.Mutex
 	var count uint64
 	wg.Add(len(conns))
+	var partitions []string
 	op := "<="
 	if cponly {
-		op = "="
+		partitions = strings.Split(partition, ",")
+		if len(partitions) == 1 {
+			op = "="
+			partition = "'" + partition + "'"
+		} else {
+			op = "in"
+			partition = "('" + strings.Join(partitions, "','") + "')"
+		}
+	} else {
+		partition = "'" + partition + "'"
 	}
-	query := fmt.Sprintf("SELECT sum(rows) FROM system.parts WHERE partition %s '%s' AND database = '%s' AND table = '%s'",
+	query := fmt.Sprintf("SELECT sum(rows) FROM system.parts WHERE partition %s %s AND database = '%s' AND table = '%s'",
 		op, partition, database, table)
 	log.Logger.Debugf("execute sql => %s", query)
 	for i := range conns {
@@ -355,6 +374,7 @@ func Ch2S3(database, table, partition string, conf config.S3, cwd string) (uint6
 	var wg sync.WaitGroup
 	var lastErr error
 	var rsize uint64
+	var lock sync.Mutex
 	wg.Add(len(conns))
 	for i := range conns {
 		conn, err := GetAvaliableConn(i)
@@ -398,7 +418,6 @@ func Ch2S3(database, table, partition string, conf config.S3, cwd string) (uint6
 					//step2: 校验数据
 					log.Logger.Infof("[%s]step3 -> check sum", conn.h)
 					s3size, err := s3client.CheckSum(conn.h, conf.Bucket, key, paths, conf)
-					log.Logger.Debugf("1111 s3size: %v", s3size)
 					if err != nil {
 						log.Logger.Warnf("[%s] check sum %s from s3 failed:%v, try to upload local file", conn.h, key, err)
 						//step3: 校验失败，尝试手动备份数据
@@ -411,14 +430,10 @@ func Ch2S3(database, table, partition string, conf config.S3, cwd string) (uint6
 							log.Logger.Errorf("[%s] check sum %s from s3 failed:%v", conn.h, key, err)
 							return err
 						}
-						log.Logger.Debugf("2222 s3size: %v", s3size)
-						atomic.AddUint64(&rsize, s3size)
-					} else {
-						log.Logger.Debugf("3333 s3size: %v", s3size)
-						atomic.AddUint64(&rsize, s3size)
 					}
-					log.Logger.Debugf("4444 s3size: %v", s3size)
-
+					lock.Lock()
+					rsize += s3size
+					lock.Unlock()
 					log.Logger.Infof("[%s]%s %s backup success", conn.h, key, partition)
 					return nil
 				},
