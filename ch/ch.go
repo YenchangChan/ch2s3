@@ -417,17 +417,19 @@ func Ch2S3(database, table, partition string, conf config.S3, cwd string) (uint6
 
 					//step2: 校验数据
 					log.Logger.Infof("[%s]step3 -> check sum", conn.h)
-					s3size, err := s3client.CheckSum(conn.h, conf.Bucket, key, paths, conf)
+					ePaths, s3size, err := s3client.CheckSum(conn.h, conf.Bucket, key, paths, conf)
 					if err != nil {
+						//backup 命令有时并不靠谱，手动upload到S3
 						log.Logger.Warnf("[%s] check sum %s from s3 failed:%v, try to upload local file", conn.h, key, err)
 						//step3: 校验失败，尝试手动备份数据
 						log.Logger.Infof("[%s]step4 -> upload data", conn.h)
-						if err := Upload(conn.opts, paths, conf, cwd); err != nil {
+						if err := Upload(conn.opts, ePaths, conf, cwd); err != nil {
 							return err
 						}
-						s3size, err = s3client.CheckSum(conn.h, conf.Bucket, key, paths, conf)
+						ePaths, s3size, err = s3client.CheckSum(conn.h, conf.Bucket, key, paths, conf)
 						if err != nil {
 							log.Logger.Errorf("[%s] check sum %s from s3 failed:%v", conn.h, key, err)
+							log.Logger.Errorf("[%s] errPaths: %v", conn.h, ePaths)
 							return err
 						}
 					}

@@ -83,14 +83,15 @@ func Remove(bucket, key string) error {
 	return nil
 }
 
-func CheckSum(host string, bucket, key string, paths map[string]utils.PathInfo, conf config.S3) (uint64, error) {
+func CheckSum(host string, bucket, key string, paths map[string]utils.PathInfo, conf config.S3) (map[string]utils.PathInfo, uint64, error) {
 	var rsize uint64
+	errPaths := make(map[string]utils.PathInfo)
 	params := &s3.ListObjectsInput{
 		Bucket: aws.String(bucket),
 	}
 	resp, err := svc.ListObjects(params)
 	if err != nil {
-		return rsize, err
+		return errPaths, rsize, err
 	}
 	rpaths := make(map[string]string)
 	for _, item := range resp.Contents {
@@ -109,14 +110,16 @@ func CheckSum(host string, bucket, key string, paths map[string]utils.PathInfo, 
 		if _, ok := rpaths[k]; ok {
 			if conf.CheckSum {
 				if v.MD5 != rpaths[k] {
-					return rsize, fmt.Errorf("checksum mismatch for %s, expect %s, but got %s", k, v, rpaths[k])
+					errPaths[k] = v
+					err = fmt.Errorf("checksum mismatch for %s, expect %s, but got %s", k, v, rpaths[k])
 				}
 			}
 		} else {
-			return rsize, fmt.Errorf("file %s not found on s3", k)
+			errPaths[k] = v
+			err = fmt.Errorf("file %s not found on s3", k)
 		}
 	}
-	return rsize, nil
+	return errPaths, rsize, err
 }
 
 func Upload(bucket, folderPath, key string, dryrun bool) error {
