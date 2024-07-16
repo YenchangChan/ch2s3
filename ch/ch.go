@@ -429,9 +429,9 @@ func Ch2S3(database, table, partition string, conf config.S3, cwd string) (uint6
 				if conf.CleanIfFail {
 					// 删除s3上的不完整的数据
 					log.Logger.Warnf("[%s] %v, try to clean", conn.h, err)
-					err = s3client.Remove(conf.Bucket, key)
-					if err != nil {
-						log.Logger.Errorf("[%s] clean data %s from s3 failed:%v", conn.h, key, err)
+					err2 := s3client.Remove(conf.Bucket, key)
+					if err2 != nil {
+						log.Logger.Errorf("[%s] clean data %s from s3 failed:%v", conn.h, key, err2)
 					}
 				}
 				lastErr = err
