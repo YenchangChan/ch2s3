@@ -1,4 +1,4 @@
-VERSION ?= "1.1.3"
+VERSION ?= "1.1.4"
 TIMESTAMP = $(shell date +%Y%m%d)
 TIME=$(shell date +%Y%m%dT%H:%M:%S)
 REVISION=$(shell git log --oneline | head -n1 | cut -f1 -d" ")
