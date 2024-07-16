@@ -11,10 +11,10 @@ import (
 
 func Upload(opts utils.SshOptions, paths map[string]utils.PathInfo, conf config.S3, cwd string) error {
 	//上传s3uploader 到对端机器
-	if err := utils.ScpUploadFile(path.Join(cwd, "bin", "s3uploader"), "/opt/s3uploader", opts); err != nil {
+	if err := utils.ScpUploadFile(path.Join(cwd, "bin", "s3uploader"), "/tmp/s3uploader", opts); err != nil {
 		return err
 	}
-	if _, err := utils.RemoteExecute(opts, "chmod u+x /opt/s3uploader"); err != nil {
+	if _, err := utils.RemoteExecute(opts, "chmod u+x /tmp/s3uploader"); err != nil {
 		return err
 	}
 	//执行s3uploader 命令
@@ -45,7 +45,7 @@ func Upload(opts utils.SshOptions, paths map[string]utils.PathInfo, conf config.
 
 	for _, v := range pathInfo {
 		log.Logger.Debugf("[%s]lpath: %s, rpath: %v", opts.Host, v.LPath, v.RPath)
-		cmd := fmt.Sprintf("/opt/s3uploader -b %s -f %s -a %s -s %s -r %s -e %s",
+		cmd := fmt.Sprintf("/tmp/s3uploader -b %s -f %s -a %s -s %s -r %s -e %s",
 			v.RPath, v.LPath, conf.AccessKey, conf.SecretKey, conf.Region, conf.Endpoint)
 		log.Logger.Infof("[%s]cmd: %s", opts.Host, cmd)
 		if _, err := utils.RemoteExecute(opts, cmd); err != nil {
@@ -54,7 +54,7 @@ func Upload(opts utils.SshOptions, paths map[string]utils.PathInfo, conf config.
 
 	}
 	//删除s3uploader工具
-	if _, err := utils.RemoteExecute(opts, "rm -f /opt/s3uploader"); err != nil {
+	if _, err := utils.RemoteExecute(opts, "rm -f /tmp/s3uploader"); err != nil {
 		return err
 	}
 	return nil
