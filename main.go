@@ -3,6 +3,7 @@ package main
 import (
 	"encoding/json"
 	"flag"
+	"fmt"
 	"os"
 	"path/filepath"
 	"strconv"
@@ -30,7 +31,8 @@ var (
 func main() {
 	conf, err := config.ParseConfig(cwd)
 	if err != nil {
-		log.Logger.Panicf("parse config failed:%v", err)
+		fmt.Printf("parse config failed:%v\n", err)
+		os.Exit(-1)
 	}
 	log.InitLogger(conf.LogLevel, []string{"stdout", "ch2s3.log"})
 	log.Logger.Infof("ch2s3, partition: %s, cwd: %s, version: %s, build timestamp: %s, git hash: %s",
