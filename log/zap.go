@@ -10,7 +10,7 @@ var ZapLog *zap.Logger
 
 func InitLogger(level string, paths []string) {
 	var err error
-	cfg := zap.NewDevelopmentConfig()
+	cfg := zap.NewProductionConfig()
 	cfg.Encoding = "console"
 	zaplevel := zapcore.InfoLevel
 	zaplevel.UnmarshalText([]byte(level))

@@ -3,6 +3,7 @@ package main
 import (
 	"encoding/json"
 	"os"
+	"strings"
 
 	"github.com/YenchangChan/ch2s3/config"
 	"github.com/YenchangChan/ch2s3/log"
@@ -48,12 +49,15 @@ func main() {
 		log.Logger.Panic(err)
 		return
 	}
-	err = s3client.Upload(conf.Bucket, opts.FolderPath, opts.BucketName, opts.DryRun)
-	if err != nil {
-		if conf.CleanIfFail {
-			s3client.Remove(conf.Bucket, opts.BucketName)
+	files := strings.Split(opts.FolderPath, ",")
+	for _, file := range files {
+		err = s3client.Upload(conf.Bucket, file, opts.BucketName, opts.DryRun)
+		if err != nil {
+			if conf.CleanIfFail {
+				s3client.Remove(conf.Bucket, opts.BucketName)
+			}
+			log.Logger.Panic(err)
+			os.Exit(1)
 		}
-		log.Logger.Panic(err)
-		os.Exit(1)
 	}
 }

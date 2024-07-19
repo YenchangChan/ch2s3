@@ -112,11 +112,13 @@ func CheckSum(host string, bucket, key string, paths map[string]utils.PathInfo, 
 				if v.MD5 != rpaths[k] {
 					errPaths[k] = v
 					err = fmt.Errorf("checksum mismatch for %s, expect %s, but got %s", k, v, rpaths[k])
+					log.Logger.Warnf("[%s]%v", host, err)
 				}
 			}
 		} else {
 			errPaths[k] = v
 			err = fmt.Errorf("file %s not found on s3", k)
+			log.Logger.Warnf("[%s]%v", host, err)
 		}
 	}
 	return errPaths, rsize, err
@@ -138,41 +140,56 @@ func Upload(bucket, folderPath, key string, dryrun bool) error {
 
 		if !info.IsDir() {
 			pool.Submit(func() {
-				skey := path.Join(key, filepath.Base(fpath))
-				if !dryrun {
-					file, err := os.Open(fpath)
-					if err != nil {
-						log.Logger.Errorf("Error opening file:%v", err)
-						lastErr = err
-						return
-					}
-					defer file.Close()
-					_, err = svc.PutObjectWithContext(context.Background(), &s3.PutObjectInput{
-						Bucket: aws.String(bucket),
-						Key:    aws.String(skey),
-						Body:   file,
-					})
-					if err != nil {
-						if aerr, ok := err.(awserr.Error); ok && aerr.Code() == request.CanceledErrorCode {
-							lastErr = fmt.Errorf("upload canceled due to timeout, %v", err)
-							return
-						}
-						lastErr = fmt.Errorf("failed to upload object, %v", err)
-						return
-					}
-					cnt++
+				if err := uploadFile(key, fpath, bucket, dryrun); err != nil {
+					lastErr = err
+					return
 				}
-				log.Logger.Infof("Uploaded:[%s] to [%s]", fpath, skey)
+				cnt++
 			})
+			pool.Wait()
+			if lastErr != nil {
+				return lastErr
+			}
 		}
-		return lastErr
+
+		return nil
 	})
-	pool.Wait()
 
 	if err != nil {
 		log.Logger.Errorf("Error walking the folder: %v", err)
 		return err
 	}
+	if lastErr != nil {
+		log.Logger.Errorf("Error uploading files: %v", lastErr)
+		return lastErr
+	}
 	log.Logger.Infof("%d files upload to s3 success! Elapsed: %v sec", cnt, time.Since(start).Seconds())
+	return nil
+}
+
+func uploadFile(key, fpath, bucket string, dryrun bool) error {
+	skey := path.Join(key, filepath.Base(fpath))
+	if !dryrun {
+		file, err := os.Open(fpath)
+		if err != nil {
+			log.Logger.Errorf("Error opening file:%v", err)
+			return err
+		}
+		defer file.Close()
+		_, err = svc.PutObjectWithContext(context.Background(), &s3.PutObjectInput{
+			Bucket: aws.String(bucket),
+			Key:    aws.String(skey),
+			Body:   file,
+		})
+		if err != nil {
+			if aerr, ok := err.(awserr.Error); ok && aerr.Code() == request.CanceledErrorCode {
+				log.Logger.Error(err)
+				return fmt.Errorf("upload canceled due to timeout, %v", err)
+			}
+			log.Logger.Error(err)
+			return fmt.Errorf("failed to upload object, %v", err)
+		}
+	}
+	log.Logger.Infof("Uploaded:[%s] to [%s]", fpath, skey)
 	return nil
 }
