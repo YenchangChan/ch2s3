@@ -262,7 +262,7 @@ func genBackupSql(database, table, partition, host string, conf config.S3) (stri
 		partition, database, table, host)
 	sql += fmt.Sprintf(" TO S3('%s/%s', '%s', '%s')",
 		conf.Endpoint, key, conf.AccessKey, conf.SecretKey)
-	sql += fmt.Sprintf(" SETTINGS compression_method='%s', compression_level=%d", conf.CompressMethod, conf.CompressLevel)
+	sql += fmt.Sprintf(" SETTINGS compression_method='%s', compression_level=%d, deduplicate_files = 0", conf.CompressMethod, conf.CompressLevel)
 	return key, sql
 }
 

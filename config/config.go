@@ -73,7 +73,7 @@ func setDefaults(conf *Config) {
 	conf.S3Disk.CompressLevel = 3
 	conf.S3Disk.RetryTimes = 1 //不重试
 	conf.S3Disk.UsePathStyle = true
-	conf.S3Disk.CheckSum = true
+	conf.S3Disk.CheckSum = false
 
 	conf.LogLevel = "info"
 }
