@@ -86,23 +86,48 @@ func Remove(bucket, key string) error {
 func CheckSum(host string, bucket, key string, paths map[string]utils.PathInfo, conf config.S3) (map[string]utils.PathInfo, uint64, error) {
 	var rsize uint64
 	errPaths := make(map[string]utils.PathInfo)
-	params := &s3.ListObjectsInput{
-		Bucket: aws.String(bucket),
+
+	subKeys := make(map[string]struct{})
+	for _, v := range paths {
+		if v.Host != host {
+			continue
+		}
+		subKey := path.Dir(v.RPath)
+		if _, ok := subKeys[subKey]; ok {
+			continue
+		}
+		subKeys[subKey] = struct{}{}
 	}
-	resp, err := svc.ListObjects(params)
-	if err != nil {
-		return errPaths, rsize, err
-	}
+
 	rpaths := make(map[string]string)
-	for _, item := range resp.Contents {
-		if strings.HasPrefix(*item.Key, key) {
+	cnt := 0
+	for subkey := range subKeys {
+		params := &s3.ListObjectsInput{
+			Bucket: aws.String(bucket),
+			Prefix: aws.String(subkey),
+		}
+		resp, err := svc.ListObjects(params)
+		if err != nil {
+			return errPaths, rsize, err
+		}
+
+		subCnt := 0
+		for _, item := range resp.Contents {
 			checksum := strings.Trim(*item.ETag, "\"")
 			size := *item.Size
 			rsize += uint64(size)
+			subCnt++
 			rpaths[*item.Key] = checksum
-			log.Logger.Debugf("remote s3 path: %s, checksum: %s", *item.Key, checksum)
+			log.Logger.Debugf("[%s]remote s3 path: %s, checksum: %s", host, *item.Key, checksum)
+		}
+		log.Logger.Infof("[%s] %s remote count: %d", host, subkey, subCnt)
+		cnt += subCnt
+		if subCnt == 1000 {
+			log.Logger.Warnf("NOTICE: %s has more than 1000 keys, may not list all.", subkey)
 		}
 	}
+	log.Logger.Infof("[%s] %s remote total count: %d", host, key, cnt)
+	var err error
 	for k, v := range paths {
 		if v.Host != host {
 			continue

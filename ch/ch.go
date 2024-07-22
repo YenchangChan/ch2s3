@@ -42,6 +42,9 @@ func Connect(conf config.Ch) error {
 				Compression: &clickhouse.Compression{
 					Method: clickhouse.CompressionLZ4,
 				},
+				Settings: clickhouse.Settings{
+					"max_execution_time": 0,
+				},
 				ReadTimeout: time.Duration(conf.ReadTimeout) * time.Second,
 			}
 			c, err := clickhouse.Open(&opts)
@@ -399,6 +402,7 @@ func Ch2S3(database, table, partition string, conf config.S3, cwd string) (uint6
 				AGAIN:
 					err = conn.c.Exec(context.Background(), query)
 					if err != nil {
+						log.Logger.Errorf("[%s]backup failed: %v", conn.h, err)
 						var exception *clickhouse.Exception
 						if errors.As(err, &exception) {
 							if exception.Code == 598 && conf.CleanIfFail {
@@ -429,7 +433,7 @@ func Ch2S3(database, table, partition string, conf config.S3, cwd string) (uint6
 						ePaths, s3size, err = s3client.CheckSum(conn.h, conf.Bucket, key, paths, conf)
 						if err != nil {
 							log.Logger.Errorf("[%s] check sum %s from s3 failed:%v", conn.h, key, err)
-							log.Logger.Errorf("[%s] errPaths: %v", conn.h, ePaths)
+							//log.Logger.Errorf("[%s] errPaths: %v", conn.h, ePaths)
 							return err
 						}
 					}
@@ -450,6 +454,8 @@ func Ch2S3(database, table, partition string, conf config.S3, cwd string) (uint6
 					if err2 != nil {
 						log.Logger.Errorf("[%s] clean data %s from s3 failed:%v", conn.h, key, err2)
 					}
+				} else {
+					log.Logger.Errorf("[%s] %v", conn.h, err)
 				}
 				lastErr = err
 				return

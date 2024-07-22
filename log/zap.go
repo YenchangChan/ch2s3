@@ -16,7 +16,7 @@ func InitLogger(level string, paths []string) {
 	zaplevel.UnmarshalText([]byte(level))
 	cfg.Level.SetLevel(zaplevel)
 	cfg.EncoderConfig.EncodeTime = zapcore.ISO8601TimeEncoder
-	cfg.EncoderConfig.EncodeLevel = zapcore.CapitalColorLevelEncoder
+	cfg.EncoderConfig.EncodeLevel = zapcore.CapitalLevelEncoder
 	if len(paths) == 0 {
 		paths = []string{"stdout"}
 	}
