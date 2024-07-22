@@ -2,8 +2,8 @@ package main
 
 import (
 	"encoding/json"
-	"os"
 	"strings"
+	"sync"
 
 	"github.com/YenchangChan/ch2s3/config"
 	"github.com/YenchangChan/ch2s3/log"
@@ -50,14 +50,26 @@ func main() {
 		return
 	}
 	files := strings.Split(opts.FolderPath, ",")
+	var wg sync.WaitGroup
+	var lastErr error
+	wg.Add(len(files))
 	for _, file := range files {
-		err = s3client.Upload(conf.Bucket, file, opts.BucketName, opts.DryRun)
-		if err != nil {
-			if conf.CleanIfFail {
-				s3client.Remove(conf.Bucket, opts.BucketName)
+		go func(file string) {
+			defer wg.Done()
+			err = s3client.Upload(conf.Bucket, file, opts.BucketName, opts.DryRun)
+			if err != nil {
+				if conf.CleanIfFail {
+					s3client.Remove(conf.Bucket, opts.BucketName)
+				}
+				lastErr = err
+				return
 			}
-			log.Logger.Panic(err)
-			os.Exit(1)
-		}
+		}(file)
 	}
+	wg.Wait()
+	if lastErr != nil {
+		log.Logger.Panic(lastErr)
+		return
+	}
+	log.Logger.Infoln("Upload success")
 }

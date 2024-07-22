@@ -146,6 +146,7 @@ func CheckSum(host string, bucket, key string, paths map[string]utils.PathInfo, 
 			log.Logger.Warnf("[%s]%v", host, err)
 		}
 	}
+	log.Logger.Infof("errPaths: %d", len(errPaths))
 	return errPaths, rsize, err
 }
 

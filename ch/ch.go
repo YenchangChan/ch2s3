@@ -427,7 +427,7 @@ func Ch2S3(database, table, partition string, conf config.S3, cwd string) (uint6
 						log.Logger.Warnf("[%s] check sum %s from s3 failed:%v, try to upload local file", conn.h, key, err)
 						//step3: 校验失败，尝试手动备份数据
 						log.Logger.Infof("[%s]step4 -> upload data", conn.h)
-						if err := Upload(conn.opts, ePaths, conf, cwd); err != nil {
+						if err := UploadFiles(conn.opts, ePaths, conf, cwd); err != nil {
 							return err
 						}
 						ePaths, s3size, err = s3client.CheckSum(conn.h, conf.Bucket, key, paths, conf)
