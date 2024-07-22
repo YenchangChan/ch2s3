@@ -311,35 +311,47 @@ func Paths(database, table, partition string, conf config.S3) (map[string]utils.
 			allPaths = append(allPaths, path)
 		}
 		if conf.CheckSum {
+			var wg sync.WaitGroup
+			var lastErr error
+			wg.Add(len(allPaths))
 			for _, p := range allPaths {
-				log.Logger.Debugf("shell: md5sum %s", p)
-				out, err := utils.RemoteExecute(conn.opts, fmt.Sprintf("md5sum %s", p))
-				if err != nil {
-					log.Logger.Errorf("md5sum %s failed: %v", p, err)
-					return nil, err
-				}
-				log.Logger.Debugf("out: %s", out)
-				for _, line := range strings.Split(out, "\n") {
-					if line == "" {
-						continue
+				go func(p string) {
+					defer wg.Done()
+					log.Logger.Debugf("shell: md5sum %s", p)
+					out, err := utils.RemoteExecute(conn.opts, fmt.Sprintf("md5sum %s", p))
+					if err != nil {
+						log.Logger.Errorf("md5sum %s failed: %v", p, err)
+						lastErr = err
+						return
 					}
-					fields := strings.Fields(line)
-					if len(fields) != 2 {
-						return nil, fmt.Errorf("md5sum output format error: %s", line)
+					log.Logger.Debugf("out: %s", out)
+					for _, line := range strings.Split(out, "\n") {
+						if line == "" {
+							continue
+						}
+						fields := strings.Fields(line)
+						if len(fields) != 2 {
+							lastErr = fmt.Errorf("md5sum output format error: %s", line)
+							return
+						}
+						md5sum := fields[0]
+						pp := strings.Split(fields[1], "/")
+						partfiles := strings.Join(pp[len(pp)-2:], "/")
+						key := fmt.Sprintf("%s/%s.%s/%s/data/%s/%s/%s",
+							partition, database, table, conn.h, database, table, partfiles)
+						paths[key] = utils.PathInfo{
+							Host:  conn.h,
+							RPath: key,
+							LPath: fields[1],
+							MD5:   md5sum,
+						}
+						log.Logger.Debugf("clickhouse local path:[%s] path: %s, key: %s, checksum: %s", conn.h, fields[1], key, md5sum)
 					}
-					md5sum := fields[0]
-					pp := strings.Split(fields[1], "/")
-					partfiles := strings.Join(pp[len(pp)-2:], "/")
-					key := fmt.Sprintf("%s/%s.%s/%s/data/%s/%s/%s",
-						partition, database, table, conn.h, database, table, partfiles)
-					paths[key] = utils.PathInfo{
-						Host:  conn.h,
-						RPath: key,
-						LPath: fields[1],
-						MD5:   md5sum,
-					}
-					log.Logger.Debugf("clickhouse local path:[%s] path: %s, key: %s, checksum: %s", conn.h, fields[1], key, md5sum)
-				}
+				}(p)
+			}
+			wg.Wait()
+			if lastErr != nil {
+				return nil, lastErr
 			}
 		} else {
 			for _, p := range allPaths {
