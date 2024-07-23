@@ -2,7 +2,10 @@ package s3client
 
 import (
 	"context"
+	"crypto/md5"
+	"encoding/hex"
 	"fmt"
+	"io"
 	"net/url"
 	"os"
 	"path"
@@ -114,6 +117,32 @@ func CheckSum(host string, bucket, key string, paths map[string]utils.PathInfo, 
 		subCnt := 0
 		for _, item := range resp.Contents {
 			checksum := strings.Trim(*item.ETag, "\"")
+			if strings.Contains(checksum, "-") && conf.CheckSum {
+				//分段上传, 由于不知道UploadId, 无法计算具体的MD5值, 需要将对象下载下来，分段计算MD5
+				log.Logger.Infof("key %s is multipart upload, checksum: %s", *item.Key, checksum)
+				output, err := svc.GetObject(&s3.GetObjectInput{
+					Bucket: aws.String(bucket),
+					Key:    item.Key,
+				})
+				if err != nil {
+					return errPaths, rsize, err
+				}
+				defer output.Body.Close()
+				//一次读取32MB
+				segment := make([]byte, 1048576*32)
+				hash := md5.New()
+				for {
+					n, err := output.Body.Read(segment)
+					if err != nil && err != io.EOF {
+						return errPaths, rsize, err
+					}
+					if n == 0 {
+						break
+					}
+					hash.Write(segment[:n])
+				}
+				checksum = hex.EncodeToString(hash.Sum(nil))
+			}
 			size := *item.Size
 			rsize += uint64(size)
 			subCnt++
@@ -132,9 +161,9 @@ func CheckSum(host string, bucket, key string, paths map[string]utils.PathInfo, 
 		if v.Host != host {
 			continue
 		}
-		if _, ok := rpaths[k]; ok {
+		if checksum, ok := rpaths[k]; ok {
 			if conf.CheckSum {
-				if v.MD5 != rpaths[k] {
+				if v.MD5 != checksum {
 					errPaths[k] = v
 					err = fmt.Errorf("checksum mismatch for %s, expect %s, but got %s", k, v, rpaths[k])
 					log.Logger.Warnf("[%s]%v", host, err)
