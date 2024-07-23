@@ -402,15 +402,15 @@ func Ch2S3(database, table, partition string, conf config.S3, cwd string) (uint6
 			log.Logger.Infof("backup sql => [%s]%s", conn.h, query)
 			if err := retry.Do(
 				func() error {
-					//step0: 获取表数据
-					log.Logger.Infof("[%s]step0 -> init", conn.h)
+					//step1: 获取表数据
+					log.Logger.Infof("[%s]step1 -> init", conn.h)
 					paths, err := Paths(database, table, partition, conf)
 					if err != nil {
 						return err
 					}
-					//step1: 备份表
+					//step2: 备份表
 					again := false
-					log.Logger.Infof("[%s]step1 -> backup", conn.h)
+					log.Logger.Infof("[%s]step2 -> backup", conn.h)
 				AGAIN:
 					err = conn.c.Exec(context.Background(), query)
 					if err != nil {
@@ -431,13 +431,12 @@ func Ch2S3(database, table, partition string, conf config.S3, cwd string) (uint6
 						return err
 					}
 
-					//step2: 校验数据
+					//step3: 校验数据
 					log.Logger.Infof("[%s]step3 -> check sum", conn.h)
 					ePaths, s3size, err := s3client.CheckSum(conn.h, conf.Bucket, key, paths, conf)
-					if err != nil {
-						//backup 命令有时并不靠谱，手动upload到S3
+					if err != nil && conf.Upload {
 						log.Logger.Warnf("[%s] check sum %s from s3 failed:%v, try to upload local file", conn.h, key, err)
-						//step3: 校验失败，尝试手动备份数据
+						//step4: 校验失败，尝试手动备份数据
 						log.Logger.Infof("[%s]step4 -> upload data", conn.h)
 						if err := UploadFiles(conn.opts, ePaths, conf, cwd); err != nil {
 							return err
@@ -445,7 +444,6 @@ func Ch2S3(database, table, partition string, conf config.S3, cwd string) (uint6
 						ePaths, s3size, err = s3client.CheckSum(conn.h, conf.Bucket, key, paths, conf)
 						if err != nil {
 							log.Logger.Errorf("[%s] check sum %s from s3 failed:%v", conn.h, key, err)
-							//log.Logger.Errorf("[%s] errPaths: %v", conn.h, ePaths)
 							return err
 						}
 					}
