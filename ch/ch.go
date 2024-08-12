@@ -368,6 +368,9 @@ func Paths(database, table, partition string, conf config.S3) (map[string]utils.
 					}
 					line = strings.TrimSuffix(line, "\r")
 					pp := strings.Split(line, "/")
+					if len(pp) < 3 {
+						continue
+					}
 					partfiles := strings.Join(pp[len(pp)-2:], "/")
 					key := fmt.Sprintf("%s/%s.%s/%s/data/%s/%s/%s",
 						partition, database, table, conn.h, database, table, partfiles)
