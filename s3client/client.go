@@ -42,7 +42,7 @@ func NewSession(conf *config.S3) error {
 	} else {
 		endpoint = conf.Endpoint
 	}
-	log.Logger.Infof("path: %s, endpoint: %s, bucket: %s\n", u.Path, endpoint, conf.Bucket)
+	log.Logger.Infof("path: %s, endpoint: %s, bucket: %s", u.Path, endpoint, conf.Bucket)
 	if conf.Bucket == "" || conf.Region == "" {
 		return fmt.Errorf("bucket and region must not be empty")
 	}
@@ -63,25 +63,47 @@ func NewSession(conf *config.S3) error {
 func Remove(bucket, key string) error {
 	params := &s3.ListObjectsInput{
 		Bucket: aws.String(bucket),
+		Prefix: aws.String(key),
 	}
 	resp, err := svc.ListObjects(params)
 	if err != nil {
 		return err
 	}
+LOOP_DEL:
+	log.Logger.Infof("key %s has %d objects need to delete", key, len(resp.Contents))
 	for _, item := range resp.Contents {
-		if strings.HasPrefix(*item.Key, key) {
-			log.Logger.Debugf("%s need to delete\n", *item.Key)
-			_, err := svc.DeleteObject(&s3.DeleteObjectInput{
+		log.Logger.Debugf("%s need to delete", *item.Key)
+		_, err := svc.DeleteObject(&s3.DeleteObjectInput{
+			Bucket: aws.String(bucket),
+			Key:    item.Key,
+		})
+		if err != nil {
+			log.Logger.Errorf("delete %s failed", *item.Key)
+			return err
+		} else {
+			err = svc.WaitUntilObjectNotExists(&s3.HeadObjectInput{
 				Bucket: aws.String(bucket),
 				Key:    item.Key,
 			})
 			if err != nil {
-				log.Logger.Errorf("delete %s failed\n", *item.Key)
+				log.Logger.Errorf("delete %s failed", *item.Key)
 				return err
-			} else {
-				log.Logger.Debugf("%s deleted\n", *item.Key)
 			}
+			log.Logger.Debugf("%s deleted", *item.Key)
 		}
+	}
+
+	//由于一次最多只能删除1000个object，删除之后查一把还有没有没删除的
+	resp, err = svc.ListObjects(params)
+	if err != nil {
+		return err
+	}
+	if len(resp.Contents) == 0 {
+		log.Logger.Infof("object %s is empty", key)
+	} else {
+		//没删除干净，再来一次
+		log.Logger.Infof("object %s is not empty, still %d objects remained, try again", key, len(resp.Contents))
+		goto LOOP_DEL
 	}
 	return nil
 }
@@ -191,7 +213,7 @@ func Upload(bucket, folderPath, key string, dryrun bool) error {
 			return err
 		}
 
-		log.Logger.Debugf("Visiting:%v\n", fpath)
+		log.Logger.Debugf("Visiting:%v", fpath)
 
 		if !info.IsDir() {
 			pool.Submit(func() {

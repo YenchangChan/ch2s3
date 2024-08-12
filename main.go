@@ -31,7 +31,7 @@ var (
 func main() {
 	conf, err := config.ParseConfig(cwd)
 	if err != nil {
-		fmt.Printf("parse config failed:%v\n", err)
+		fmt.Printf("parse config failed:%v", err)
 		os.Exit(-1)
 	}
 	log.InitLogger(conf.LogLevel, []string{"stdout", "ch2s3.log"})
