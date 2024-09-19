@@ -12,6 +12,7 @@ import (
 	"github.com/YenchangChan/ch2s3/constant"
 	"github.com/YenchangChan/ch2s3/log"
 	"github.com/YenchangChan/ch2s3/s3client"
+	"github.com/bndr/gotabulate"
 )
 
 type Backup struct {
@@ -149,11 +150,11 @@ func (this *Backup) Repoter(op_type string) error {
 	if err != nil {
 		return err
 	}
-	f.WriteString("+--------------------------------+---------------+------------------+-----------------+-----------------+-----------+---------------+---------------+\n")
-	f.WriteString("|            table               |     rows      |size(uncompressed)| size(compressed)|  remote_size    | partition |   elapsed     |    status     |\n")
-	f.WriteString("+--------------------------------+---------------+------------------+-----------------+-----------------+-----------+---------------+---------------+\n")
+	var data [][]interface{}
+
+	data = append(data, []interface{}{"table", "rows", "size(uncompressed)", "size(compressed)", "remote_size", "partition", "elapsed", "status"})
 	for k, v := range this.states {
-		f.WriteString(fmt.Sprintf("|%32s|%15d|%18s|%17s|%17s|%11d|%11d sec|%15s|\n", k, v.rows, formatReadableSize(v.buncsize), formatReadableSize(v.bcsize), formatReadableSize(v.rsize), v.partitions, v.elasped, status(v.extval)))
+		data = append(data, []interface{}{k, v.rows, formatReadableSize(v.buncsize), formatReadableSize(v.bcsize), formatReadableSize(v.rsize), v.partitions, v.elasped, status(v.extval)})
 		if v.extval == constant.BACKUP_SUCCESS {
 			ok_tables++
 		} else {
@@ -162,8 +163,8 @@ func (this *Backup) Repoter(op_type string) error {
 		total_bytes += v.buncsize
 		all_costs += v.elasped
 	}
-	f.WriteString("+--------------------------------+---------------+------------------+-----------------+-----------------+-----------+---------------+---------------+\n")
-
+	tabulate := gotabulate.Create(data)
+	f.WriteString(tabulate.Render("grid"))
 	f.WriteString(fmt.Sprintf("\nTotal Tables: %d,  Success Tables: %d,  Failed Tables: %d,  Total Bytes: %s,  Elapsed: %d sec\n", ok_tables+fail_tables, ok_tables, fail_tables, formatReadableSize(total_bytes), all_costs))
 
 	if fail_tables > 0 {
