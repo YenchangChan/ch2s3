@@ -402,7 +402,9 @@ func Ch2S3(database, table, partition string, conf config.S3, cwd string) (uint6
 		go func(conn Conn) {
 			defer wg.Done()
 			key, query := genBackupSql(database, table, partition, conn.h, conf)
-			log.Logger.Infof("backup sql => [%s]%s", conn.h, query)
+			if !conf.Upload {
+				log.Logger.Infof("backup sql => [%s]%s", conn.h, query)
+			}
 			if err := retry.Do(
 				func() error {
 					//step1: 获取表数据
@@ -414,24 +416,26 @@ func Ch2S3(database, table, partition string, conf config.S3, cwd string) (uint6
 					//step2: 备份表
 					again := false
 					log.Logger.Infof("[%s]step2 -> backup", conn.h)
-				AGAIN:
-					err = conn.c.Exec(context.Background(), query)
-					if err != nil {
-						log.Logger.Errorf("[%s]backup failed: %v", conn.h, err)
-						var exception *clickhouse.Exception
-						if errors.As(err, &exception) {
-							if exception.Code == 598 && conf.CleanIfFail {
-								if !again {
-									err = s3client.Remove(conf.Bucket, key)
-									if err != nil {
-										log.Logger.Errorf("[%s] clean data %s from s3 failed:%v", conn.h, key, err)
+					if !conf.Upload {
+					AGAIN:
+						err = conn.c.Exec(context.Background(), query)
+						if err != nil {
+							log.Logger.Errorf("[%s]backup failed: %v", conn.h, err)
+							var exception *clickhouse.Exception
+							if errors.As(err, &exception) {
+								if exception.Code == 598 && conf.CleanIfFail {
+									if !again {
+										err = s3client.Remove(conf.Bucket, key)
+										if err != nil {
+											log.Logger.Errorf("[%s] clean data %s from s3 failed:%v", conn.h, key, err)
+										}
+										again = true
+										goto AGAIN
 									}
-									again = true
-									goto AGAIN
 								}
 							}
+							return err
 						}
-						return err
 					}
 
 					//step3: 校验数据
