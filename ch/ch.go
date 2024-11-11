@@ -418,8 +418,8 @@ func Ch2S3(database, table, partition string, conf config.S3, cwd string) (uint6
 					//step2: 备份表
 					again := false
 					log.Logger.Infof("[%s]step2 -> backup", conn.h)
-					ePaths, s3size, err := s3client.CheckSum(conn.h, conf.Bucket, key, paths, conf)
-					if len(ePaths) == 0 {
+					ePaths, s3size, cnt, err := s3client.CheckSum(conn.h, conf.Bucket, key, paths, conf)
+					if err == nil {
 						//说明之前备份成功过，不需要再次备份
 						lock.Lock()
 						rsize += s3size
@@ -427,9 +427,10 @@ func Ch2S3(database, table, partition string, conf config.S3, cwd string) (uint6
 						log.Logger.Infof("[%s]%s %s already backup success before", conn.h, key, partition)
 						return nil
 					}
-					if len(ePaths) == len(paths) || !conf.Upload {
-						// len(ePaths) == len(paths), 说明所有的数据在S3上都不存在，此时需要BACKUP一下，避免RESTORE失败
+					if cnt == 0 || !conf.Upload {
+						// cnt = 0, 说明所有的数据在S3上都不存在，此时需要BACKUP一下，避免RESTORE失败
 					AGAIN:
+						log.Logger.Infof("backup query: %s", query)
 						err = conn.c.Exec(context.Background(), query)
 						if err != nil {
 							log.Logger.Errorf("[%s]backup failed: %v", conn.h, err)
@@ -449,7 +450,7 @@ func Ch2S3(database, table, partition string, conf config.S3, cwd string) (uint6
 							return err
 						} else {
 							//backup 成功，需要二次check
-							ePaths, s3size, err = s3client.CheckSum(conn.h, conf.Bucket, key, paths, conf)
+							ePaths, s3size, _, err = s3client.CheckSum(conn.h, conf.Bucket, key, paths, conf)
 						}
 					}
 
@@ -462,7 +463,7 @@ func Ch2S3(database, table, partition string, conf config.S3, cwd string) (uint6
 						if err := UploadFiles(conn.opts, ePaths, conf, cwd); err != nil {
 							return err
 						}
-						ePaths, s3size, err = s3client.CheckSum(conn.h, conf.Bucket, key, paths, conf)
+						ePaths, s3size, _, err = s3client.CheckSum(conn.h, conf.Bucket, key, paths, conf)
 						if err != nil {
 							log.Logger.Errorf("[%s] check sum %s from s3 failed:%v", conn.h, key, err)
 							return err
@@ -515,6 +516,14 @@ func Restore(database, table, partition string, conf config.S3) error {
 				func() error {
 					err := conn.c.Exec(context.Background(), query)
 					if err != nil {
+						var exception *clickhouse.Exception
+						if errors.As(err, &exception) {
+							if exception.Code == 599 {
+								// 说明以前这个节点可能不存在，是新扩容的节点，此时不算失败
+								// 当然如果分片缩容副本了的场景不包含在内，此种情况解决不了
+								return nil
+							}
+						}
 						return err
 					}
 					return nil

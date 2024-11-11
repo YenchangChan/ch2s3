@@ -108,7 +108,7 @@ LOOP_DEL:
 	return nil
 }
 
-func CheckSum(host string, bucket, key string, paths map[string]utils.PathInfo, conf config.S3) (map[string]utils.PathInfo, uint64, error) {
+func CheckSum(host string, bucket, key string, paths map[string]utils.PathInfo, conf config.S3) (map[string]utils.PathInfo, uint64, int, error) {
 	var rsize uint64
 	errPaths := make(map[string]utils.PathInfo)
 
@@ -133,7 +133,7 @@ func CheckSum(host string, bucket, key string, paths map[string]utils.PathInfo, 
 		}
 		resp, err := svc.ListObjects(params)
 		if err != nil {
-			return errPaths, rsize, err
+			return errPaths, rsize, -1, err
 		}
 
 		subCnt := 0
@@ -147,7 +147,7 @@ func CheckSum(host string, bucket, key string, paths map[string]utils.PathInfo, 
 					Key:    item.Key,
 				})
 				if err != nil {
-					return errPaths, rsize, err
+					return errPaths, rsize, -1, err
 				}
 				defer output.Body.Close()
 				//一次读取32MB
@@ -156,7 +156,7 @@ func CheckSum(host string, bucket, key string, paths map[string]utils.PathInfo, 
 				for {
 					n, err := output.Body.Read(segment)
 					if err != nil && err != io.EOF {
-						return errPaths, rsize, err
+						return errPaths, rsize, -1, err
 					}
 					if n == 0 {
 						break
@@ -198,7 +198,7 @@ func CheckSum(host string, bucket, key string, paths map[string]utils.PathInfo, 
 		}
 	}
 	log.Logger.Infof("errPaths: %d", len(errPaths))
-	return errPaths, rsize, err
+	return errPaths, rsize, cnt, err
 }
 
 func Upload(bucket, folderPath, key string, dryrun bool) error {
