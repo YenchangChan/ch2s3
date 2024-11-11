@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"path"
 	"strings"
 	"sync"
 	"time"
@@ -304,9 +305,9 @@ func Paths(database, table, partition string, conf config.S3) (map[string]utils.
 			if err := rows.Scan(&path); err != nil {
 				return nil, err
 			}
-			if strings.HasSuffix(path, "/") {
-				path += "*"
-			}
+			// if strings.HasSuffix(path, "/") {
+			// 	path += "*"
+			// }
 			log.Logger.Debugf("path: %s", path)
 			allPaths = append(allPaths, path)
 		}
@@ -356,7 +357,7 @@ func Paths(database, table, partition string, conf config.S3) (map[string]utils.
 		} else {
 			for _, p := range allPaths {
 				log.Logger.Debugf("shell: ls %s", p)
-				out, err := utils.RemoteExecute(conn.opts, fmt.Sprintf("ls %s", p))
+				out, err := utils.RemoteExecute(conn.opts, fmt.Sprintf("cd %s; ls", p))
 				if err != nil {
 					log.Logger.Errorf("ls %s failed: %v", p, err)
 					return nil, err
@@ -367,6 +368,7 @@ func Paths(database, table, partition string, conf config.S3) (map[string]utils.
 						continue
 					}
 					line = strings.TrimSuffix(line, "\r")
+					line = path.Join(p, line)
 					pp := strings.Split(line, "/")
 					if len(pp) < 3 {
 						continue
@@ -416,7 +418,17 @@ func Ch2S3(database, table, partition string, conf config.S3, cwd string) (uint6
 					//step2: 备份表
 					again := false
 					log.Logger.Infof("[%s]step2 -> backup", conn.h)
-					if !conf.Upload {
+					ePaths, s3size, err := s3client.CheckSum(conn.h, conf.Bucket, key, paths, conf)
+					if len(ePaths) == 0 {
+						//说明之前备份成功过，不需要再次备份
+						lock.Lock()
+						rsize += s3size
+						lock.Unlock()
+						log.Logger.Infof("[%s]%s %s already backup success before", conn.h, key, partition)
+						return nil
+					}
+					if len(ePaths) == len(paths) || !conf.Upload {
+						// len(ePaths) == len(paths), 说明所有的数据在S3上都不存在，此时需要BACKUP一下，避免RESTORE失败
 					AGAIN:
 						err = conn.c.Exec(context.Background(), query)
 						if err != nil {
@@ -435,14 +447,16 @@ func Ch2S3(database, table, partition string, conf config.S3, cwd string) (uint6
 								}
 							}
 							return err
+						} else {
+							//backup 成功，需要二次check
+							ePaths, s3size, err = s3client.CheckSum(conn.h, conf.Bucket, key, paths, conf)
 						}
 					}
 
 					//step3: 校验数据
 					log.Logger.Infof("[%s]step3 -> check sum", conn.h)
-					ePaths, s3size, err := s3client.CheckSum(conn.h, conf.Bucket, key, paths, conf)
 					if err != nil && conf.Upload {
-						log.Logger.Warnf("[%s] check sum %s from s3 failed:%v, try to upload local file", conn.h, key, err)
+						log.Logger.Debugf("[%s] check sum %s from s3 failed:%v, try to upload local file", conn.h, key, err)
 						//step4: 校验失败，尝试手动备份数据
 						log.Logger.Infof("[%s]step4 -> upload data", conn.h)
 						if err := UploadFiles(conn.opts, ePaths, conf, cwd); err != nil {
@@ -457,6 +471,7 @@ func Ch2S3(database, table, partition string, conf config.S3, cwd string) (uint6
 					lock.Lock()
 					rsize += s3size
 					lock.Unlock()
+
 					log.Logger.Infof("[%s]%s %s backup success", conn.h, key, partition)
 					return nil
 				},

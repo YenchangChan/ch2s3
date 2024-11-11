@@ -194,7 +194,7 @@ func CheckSum(host string, bucket, key string, paths map[string]utils.PathInfo, 
 		} else {
 			errPaths[k] = v
 			err = fmt.Errorf("file %s not found on s3", k)
-			log.Logger.Warnf("[%s]%v", host, err)
+			log.Logger.Debugf("[%s]%v", host, err)
 		}
 	}
 	log.Logger.Infof("errPaths: %d", len(errPaths))

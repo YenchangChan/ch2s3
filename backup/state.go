@@ -37,7 +37,7 @@ func (s *State) Set(key string, value any) {
 	case constant.STATE_COMPRESSED_SIZE:
 		s.bcsize = value.(uint64)
 	case constant.STATE_REMOTE_SIZE:
-		s.rsize = value.(uint64)
+		s.rsize += value.(uint64)
 	}
 }
 

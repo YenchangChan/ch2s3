@@ -10,11 +10,11 @@ import (
 
 func TestSSH(t *testing.T) {
 	log.InitLogger("debug", []string{"stdout"})
-	cmd := "ls -l"
+	cmd := "cd /data01/clickhouse/store/cb6/cb658542-efb3-4655-9278-a3b217cbe9c7/0_0_312004_7892_303610/; ls"
 	opts := SshOptions{
 		User:     "root",
-		Password: "123456",
-		Host:     "192.168.122.101",
+		Password: "",
+		Host:     "192.168.101.93",
 		Port:     22,
 	}
 	out, err := RemoteExecute(opts, cmd)
