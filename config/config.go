@@ -19,6 +19,7 @@ type S3 struct {
 	CleanIfFail    bool
 	UsePathStyle   bool `json:"use_path_style"`
 	CheckSum       bool
+	CheckCnt       bool `json:"check_count"`
 	Upload         bool //使用原生的s3命令上传
 }
 
@@ -75,6 +76,7 @@ func setDefaults(conf *Config) {
 	conf.S3Disk.RetryTimes = 1 //不重试
 	conf.S3Disk.UsePathStyle = true
 	conf.S3Disk.CheckSum = false
+	conf.S3Disk.CheckCnt = false
 	conf.S3Disk.Upload = true
 
 	conf.LogLevel = "info"

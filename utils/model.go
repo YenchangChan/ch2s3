@@ -5,4 +5,5 @@ type PathInfo struct {
 	RPath string
 	LPath string
 	MD5   string
+	Cnt   int
 }

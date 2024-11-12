@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"path"
+	"strconv"
 	"strings"
 	"sync"
 	"time"
@@ -353,6 +354,31 @@ func Paths(database, table, partition string, conf config.S3) (map[string]utils.
 			wg.Wait()
 			if lastErr != nil {
 				return nil, lastErr
+			}
+		} else if conf.CheckCnt {
+			for _, p := range allPaths {
+				log.Logger.Debugf("shell: ls %s| wc -l", p)
+				out, err := utils.RemoteExecute(conn.opts, fmt.Sprintf("cd %s; ls |wc -l", p))
+				if err != nil {
+					log.Logger.Errorf("ls %s failed: %v", p, err)
+					return nil, err
+				}
+				log.Logger.Debugf("out: %s", out)
+				out = strings.TrimSuffix(out, "\n")
+				cnt, _ := strconv.Atoi(out)
+				pp := strings.Split(p, "/")
+				if len(pp) < 3 {
+					continue
+				}
+				partfiles := strings.Join(pp[len(pp)-2:], "/")
+				key := fmt.Sprintf("%s/%s.%s/%s/data/%s/%s/%s",
+					partition, database, table, conn.h, database, table, partfiles)
+				paths[key] = utils.PathInfo{
+					Host:  conn.h,
+					RPath: key,
+					Cnt:   cnt,
+					LPath: p,
+				}
 			}
 		} else {
 			for _, p := range allPaths {

@@ -107,11 +107,20 @@ func UploadFiles(opts utils.SshOptions, paths map[string]utils.PathInfo, conf co
 
 	for _, v := range pathInfo {
 		log.Logger.Infof("[%s]s3uploader rpath: %v", opts.Host, v.RPath)
-		cmd := fmt.Sprintf("/tmp/s3uploader -b %s -f %s -a %s -s %s -r %s -e %s",
-			v.RPath, v.LPath, conf.AccessKey, conf.SecretKey, conf.Region, conf.Endpoint)
-		log.Logger.Debugf("[%s]cmd: %s", opts.Host, cmd)
-		if _, err := utils.RemoteExecute(opts, cmd); err != nil {
-			return err
+		if conf.CheckCnt {
+			cmd := fmt.Sprintf("for lpath in `ls %s`; do /tmp/s3uploader -b %s -f %s$lpath -a %s -s %s -r %s -e %s; done",
+				v.LPath, v.RPath, v.LPath, conf.AccessKey, conf.SecretKey, conf.Region, conf.Endpoint)
+			log.Logger.Infof("[%s]cmd: %s", opts.Host, cmd)
+			if _, err := utils.RemoteExecute(opts, cmd); err != nil {
+				return err
+			}
+		} else {
+			cmd := fmt.Sprintf("/tmp/s3uploader -b %s -f %s -a %s -s %s -r %s -e %s",
+				v.RPath, v.LPath, conf.AccessKey, conf.SecretKey, conf.Region, conf.Endpoint)
+			log.Logger.Debugf("[%s]cmd: %s", opts.Host, cmd)
+			if _, err := utils.RemoteExecute(opts, cmd); err != nil {
+				return err
+			}
 		}
 
 	}

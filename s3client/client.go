@@ -125,6 +125,7 @@ func CheckSum(host string, bucket, key string, paths map[string]utils.PathInfo, 
 	}
 
 	rpaths := make(map[string]string)
+	rcnts := make(map[string]int)
 	cnt := 0
 	for subkey := range subKeys {
 		params := &s3.ListObjectsInput{
@@ -173,6 +174,7 @@ func CheckSum(host string, bucket, key string, paths map[string]utils.PathInfo, 
 		}
 		log.Logger.Infof("[%s] %s remote count: %d", host, subkey, subCnt)
 		cnt += subCnt
+		rcnts[subkey+"/"] = subCnt
 		if subCnt == 1000 {
 			log.Logger.Warnf("NOTICE: %s has more than 1000 keys, may not list all.", subkey)
 		}
@@ -187,14 +189,24 @@ func CheckSum(host string, bucket, key string, paths map[string]utils.PathInfo, 
 			if conf.CheckSum {
 				if v.MD5 != checksum {
 					errPaths[k] = v
-					err = fmt.Errorf("checksum mismatch for %s, expect %s, but got %s", k, v, rpaths[k])
+					err = fmt.Errorf("checksum mismatch for %v, expect %v, but got %v", k, v.MD5, checksum)
 					log.Logger.Warnf("[%s]%v", host, err)
 				}
 			}
 		} else {
-			errPaths[k] = v
-			err = fmt.Errorf("file %s not found on s3", k)
-			log.Logger.Debugf("[%s]%v", host, err)
+			if conf.CheckCnt {
+				if cnt, ok := rcnts[k]; ok {
+					if cnt != v.Cnt {
+						errPaths[k] = v
+						err = fmt.Errorf("check count mismatch for %v, expect %v, but got %v", k, v.Cnt, cnt)
+						log.Logger.Warnf("[%s]%v", host, err)
+					}
+				}
+			} else {
+				errPaths[k] = v
+				err = fmt.Errorf("file %s not found on s3", k)
+				log.Logger.Debugf("[%s]%v", host, err)
+			}
 		}
 	}
 	log.Logger.Infof("errPaths: %d", len(errPaths))
